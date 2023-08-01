@@ -1,4 +1,4 @@
-package com.react_native_raw;
+package com.parliamo;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -14,7 +14,7 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "react_Native_raw";
+    return "parliamo";
   }
 
   /**

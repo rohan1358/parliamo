@@ -1,4 +1,4 @@
-package com.react_native_raw;
+package com.parliamo;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

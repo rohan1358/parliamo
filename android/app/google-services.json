@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "544144684249",
+    "project_id": "parlimo-app",
+    "storage_bucket": "parlimo-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:544144684249:android:829a92d890b5dbb9b6bac8",
+        "android_client_info": {
+          "package_name": "com.parliamo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "544144684249-vtvg0stmmvgu4712sh494f32bber1lqr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.parliamo",
+            "certificate_hash": "320330a66c9e1cfb4d7787463f35defc6e989fe5"
+          }
+        },
+        {
+          "client_id": "544144684249-frhqsibqdqjfrj7k7jokhs0alhjevbfr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCRGaVoOlJwav4iGd1icmX9_tlQ0FYd6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "544144684249-frhqsibqdqjfrj7k7jokhs0alhjevbfr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

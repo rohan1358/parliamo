@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "react_native_raw.app"
-               BlueprintName = "react_native_raw"
-               ReferencedContainer = "container:react_native_raw.xcodeproj">
+               BuildableName = "parliamo.app"
+               BlueprintName = "parliamo"
+               ReferencedContainer = "container:parliamo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "react_native_rawTests.xctest"
-               BlueprintName = "react_native_rawTests"
-               ReferencedContainer = "container:react_native_raw.xcodeproj">
+               BuildableName = "parliamoTests.xctest"
+               BlueprintName = "parliamoTests"
+               ReferencedContainer = "container:parliamo.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "react_native_raw.app"
-            BlueprintName = "react_native_raw"
-            ReferencedContainer = "container:react_native_raw.xcodeproj">
+            BuildableName = "parliamo.app"
+            BlueprintName = "parliamo"
+            ReferencedContainer = "container:parliamo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "react_native_raw.app"
-            BlueprintName = "react_native_raw"
-            ReferencedContainer = "container:react_native_raw.xcodeproj">
+            BuildableName = "parliamo.app"
+            BlueprintName = "parliamo"
+            ReferencedContainer = "container:parliamo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
