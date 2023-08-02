@@ -295,7 +295,11 @@ const Profile = () => {
           <View style={styles.subContainer2}>
             <Text style={styles.media}>Media</Text>
           </View>
-          <View
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => {
+              toggleSwitch();
+            }}
             style={{
               ...styles.subContainer2,
               justifyContent: 'center',
@@ -307,14 +311,16 @@ const Profile = () => {
               trackColor={{false: lightblue[50], true: lightblue[300]}}
               thumbColor={isEnabled ? lightblue[500] : lightblue[400]}
               ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSwitch}
+              onValueChange={() => {
+                toggleSwitch();
+              }}
               value={isEnabled}
               style={{
                 position: 'absolute',
                 right: 0,
               }}
             />
-          </View>
+          </TouchableOpacity>
           <View style={styles.subContainer2}>
             <Text style={styles.mcm}>
               <Icon name="music-note" size={20} /> Custom Notification

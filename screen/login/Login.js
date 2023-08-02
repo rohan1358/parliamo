@@ -1,0 +1,292 @@
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Animated,
+  Dimensions,
+} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {lightblue} from '../../assets/color/color';
+
+import parliamoImg from '../../assets/image/parliamo.png';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+
+const sleep = ms => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+const getNumFruit = fruit => {
+  return sleep(2000).then(v => fruit);
+};
+
+const textParliamo = ['P', 'A', 'R', 'L', 'I', 'A', 'M', 'O'];
+
+const Login = () => {
+  const [currentText, setCurrentText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const fadeAnim2 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const fadeAnim3 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const slideAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const slideAnim2 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const slideAnim3 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const slideAnim4 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const slideAnim5 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    if (currentIndex < textParliamo.length) {
+      const timeout = setTimeout(() => {
+        setCurrentText(prevText => prevText + textParliamo[currentIndex]);
+        setCurrentIndex(prevIndex => prevIndex + 1);
+      }, 50);
+
+      return () => {
+        clearTimeout(timeout);
+
+        if (currentIndex === 7) {
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: false,
+          }).start(cb => {
+            Animated.timing(fadeAnim2, {
+              toValue: 1,
+              duration: 500,
+              useNativeDriver: false,
+            }).start(cb => {
+              Animated.timing(slideAnim, {
+                toValue: 33.45454406738281,
+                duration: 500,
+                useNativeDriver: false,
+              }).start(cb => {});
+              Animated.timing(fadeAnim3, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: false,
+              }).start(cb => {
+                Animated.timing(slideAnim2, {
+                  toValue: Dimensions.get('screen').width,
+                  duration: 500,
+                  useNativeDriver: false,
+                }).start(cb => {
+                  Animated.timing(slideAnim3, {
+                    toValue: Dimensions.get('screen').width,
+                    duration: 500,
+                    useNativeDriver: false,
+                  }).start(cb => {
+                    Animated.timing(slideAnim4, {
+                      toValue: -200,
+                      duration: 500,
+                      useNativeDriver: false,
+                    }).start(cb => {
+                      Animated.timing(slideAnim5, {
+                        toValue: -200,
+                        duration: 500,
+                        useNativeDriver: false,
+                      }).start(cb => {});
+                    });
+                  });
+                });
+              });
+            });
+          });
+        }
+      };
+    }
+  }, [currentIndex, textParliamo, fadeAnim, slideAnim, fadeAnim2]);
+
+  return (
+    <View style={styles.container}>
+      <Text
+        style={{
+          fontWeight: '700',
+          fontSize: 30,
+          letterSpacing: 2,
+          color: lightblue[500],
+        }}>
+        {currentText}
+      </Text>
+
+      <View
+        style={{
+          width: '70%',
+          marginBottom: 15,
+        }}>
+        <Animated.View
+          style={{
+            opacity: fadeAnim2, // Bind opacity to animated value
+          }}>
+          <Image
+            source={parliamoImg}
+            style={{
+              width: '100%',
+              objectFit: 'fill',
+              height: 200,
+            }}
+          />
+        </Animated.View>
+
+        <Animated.View
+          style={{
+            transform: [{translateY: slideAnim}],
+            opacity: fadeAnim3,
+          }}>
+          <View
+            style={{
+              alignItems: 'center',
+              top: -33.45454406738281,
+            }}
+            onLayout={e => {}}>
+            <Text
+              style={{
+                fontSize: 25,
+                fontWeight: '600',
+                color: lightblue[600],
+                letterSpacing: 2,
+              }}>
+              Welcome :)
+            </Text>
+          </View>
+        </Animated.View>
+
+        <Animated.View
+          style={{
+            transform: [{translateX: slideAnim2}],
+          }}>
+          <View
+            style={[
+              styles.containerTextInput,
+              {left: -Dimensions.get('screen').width},
+            ]}>
+            <Text style={styles.label}>Username</Text>
+            <TextInput style={styles.textInput} />
+          </View>
+        </Animated.View>
+
+        <Animated.View
+          style={{
+            transform: [{translateX: slideAnim3}],
+          }}>
+          <View
+            style={[
+              styles.containerTextInput,
+              {left: -Dimensions.get('screen').width},
+            ]}>
+            <Text style={styles.label}>Password</Text>
+            <TextInput style={styles.textInput} secureTextEntry={true} />
+          </View>
+        </Animated.View>
+
+        <Animated.View
+          style={{
+            transform: [{translateX: slideAnim4}],
+            // alignItems: slideAnim4,
+          }}>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            style={{
+              alignItems: 'flex-end',
+              right: -200,
+            }}>
+            <Text
+              style={{
+                color: lightblue[500],
+                fontWeight: '500',
+                fontSize: 15,
+              }}>
+              Forgot password
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
+
+      <Animated.View
+        style={{
+          width: '50%',
+          transform: [{translateY: slideAnim5}],
+        }}>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          style={{
+            backgroundColor: lightblue[400],
+            alignItems: 'center',
+            borderRadius: 5,
+            padding: 10,
+            bottom: -200,
+          }}
+          onPress={() => {
+            navigation.navigate('ListChat');
+          }}>
+          <Text
+            style={{
+              color: lightblue[100],
+              fontWeight: '500',
+              fontSize: 18,
+              letterSpacing: 1,
+            }}>
+            Login
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* <Text>Login</Text> */}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  label: {
+    fontSize: 20,
+    fontWeight: '500',
+    color: lightblue[500],
+  },
+  textInput: {
+    borderColor: lightblue[500],
+    borderBottomWidth: 2,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderRadius: 10,
+    color: lightblue[500],
+    fontWeight: '500',
+    fontSize: 19,
+    paddingHorizontal: 15,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: lightblue[100],
+  },
+  containerTextInput: {
+    marginVertical: 5,
+  },
+});
+
+const GetReady = () => {
+  // const isFocused = useIsFocused();
+
+  const [focus, setFocus] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setFocus(true);
+
+      return () => setFocus(false);
+    }, [focus]),
+  );
+
+  if (focus) {
+    return <Login />;
+  } else {
+    return <Text>Loading . . </Text>;
+  }
+};
+
+export default GetReady;

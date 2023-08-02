@@ -5,13 +5,16 @@ import ChatScreen from './ChatScreen';
 import ListChat from './screen/ListChat/ListChat';
 import ChatRoom from './screen/ChatRoom/ChatRoom';
 import Profile from './screen/profile/Profile';
+import Login from './screen/login/Login';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Profile">
+      <Stack.Navigator
+        initialRouteName="Login"
+        screenOptions={{headerShown: false}}>
         <Stack.Screen
           name="Chat"
           component={ChatScreen}
@@ -25,12 +28,17 @@ const App = () => {
         <Stack.Screen
           name="ChatRoom"
           component={ChatRoom}
-          options={{title: 'Chat Room', headerMode: false}}
+          options={{title: 'Chat Room'}}
         />
         <Stack.Screen
           name="Profile"
           component={Profile}
-          options={{title: 'Profile', headerMode: false}}
+          options={{title: 'Profile'}}
+        />
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{title: 'Login'}}
         />
       </Stack.Navigator>
     </NavigationContainer>
