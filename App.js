@@ -6,6 +6,9 @@ import ListChat from './screen/ListChat/ListChat';
 import ChatRoom from './screen/ChatRoom/ChatRoom';
 import Profile from './screen/profile/Profile';
 import Login from './screen/login/Login';
+import Settings from './screen/Settings/Settings';
+import MyProfile from './screen/MyProfile/MyProfile';
+import QrCode from './screen/QrCode/QrCode';
 
 const Stack = createStackNavigator();
 
@@ -13,7 +16,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Login"
+        initialRouteName="QrCode"
         screenOptions={{headerShown: false}}>
         <Stack.Screen
           name="Chat"
@@ -39,6 +42,21 @@ const App = () => {
           name="Login"
           component={Login}
           options={{title: 'Login'}}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={Settings}
+          options={{title: 'Login'}}
+        />
+        <Stack.Screen
+          name="MyProfile"
+          component={MyProfile}
+          options={{title: 'My Profile', animationEnabled: false}}
+        />
+        <Stack.Screen
+          name="QrCode"
+          component={QrCode}
+          options={{title: 'QrCode', animationEnabled: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

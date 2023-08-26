@@ -13,6 +13,7 @@ import {lightblue} from '../../assets/color/color';
 
 import parliamoImg from '../../assets/image/parliamo.png';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const sleep = ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -28,14 +29,16 @@ const Login = () => {
   const [currentText, setCurrentText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-  const fadeAnim2 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-  const fadeAnim3 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-  const slideAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-  const slideAnim2 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-  const slideAnim3 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-  const slideAnim4 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-  const slideAnim5 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim2 = useRef(new Animated.Value(0)).current;
+  const fadeAnim3 = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim2 = useRef(new Animated.Value(0)).current;
+  const slideAnim3 = useRef(new Animated.Value(0)).current;
+  const slideAnim4 = useRef(new Animated.Value(0)).current;
+  const slideAnim5 = useRef(new Animated.Value(0)).current;
+  const slideAnim6 = useRef(new Animated.Value(0)).current;
+  const slideAnim7 = useRef(new Animated.Value(0)).current;
 
   const navigation = useNavigation();
 
@@ -52,7 +55,7 @@ const Login = () => {
         if (currentIndex === 7) {
           Animated.timing(fadeAnim, {
             toValue: 1,
-            duration: 500,
+            duration: 400,
             useNativeDriver: false,
           }).start(cb => {
             Animated.timing(fadeAnim2, {
@@ -89,7 +92,18 @@ const Login = () => {
                         toValue: -200,
                         duration: 500,
                         useNativeDriver: false,
-                      }).start(cb => {});
+                      }).start(cb => {
+                        Animated.timing(slideAnim6, {
+                          toValue: Dimensions.get('screen').width / 2,
+                          duration: 500,
+                          useNativeDriver: false,
+                        }).start(cb => {});
+                        Animated.timing(slideAnim7, {
+                          toValue: Dimensions.get('screen').width / 2,
+                          duration: 500,
+                          useNativeDriver: false,
+                        }).start(cb => {});
+                      });
                     });
                   });
                 });
@@ -120,7 +134,7 @@ const Login = () => {
         }}>
         <Animated.View
           style={{
-            opacity: fadeAnim2, // Bind opacity to animated value
+            opacity: fadeAnim2,
           }}>
           <Image
             source={parliamoImg}
@@ -186,7 +200,6 @@ const Login = () => {
         <Animated.View
           style={{
             transform: [{translateX: slideAnim4}],
-            // alignItems: slideAnim4,
           }}>
           <TouchableOpacity
             activeOpacity={0.5}
@@ -235,7 +248,39 @@ const Login = () => {
         </TouchableOpacity>
       </Animated.View>
 
-      {/* <Text>Login</Text> */}
+      <View
+        style={{
+          flexDirection: 'row',
+        }}>
+        <Animated.View
+          style={{
+            // width: '50%',
+            alignItems: 'flex-end',
+            left: slideAnim6,
+            flex: 1,
+          }}>
+          <TouchableOpacity
+            style={{
+              left: -Dimensions.get('screen').width / 2,
+            }}>
+            <Icon size={30} name="facebook" color={lightblue[400]} />
+          </TouchableOpacity>
+        </Animated.View>
+        <Animated.View
+          style={{
+            // width: '50%',
+            alignItems: 'flex-start',
+            right: slideAnim7,
+            flex: 1,
+          }}>
+          <TouchableOpacity
+            style={{
+              right: -Dimensions.get('screen').width / 2,
+            }}>
+            <Icon size={30} name="google" color={lightblue[400]} />
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
     </View>
   );
 };

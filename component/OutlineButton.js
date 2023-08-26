@@ -25,8 +25,9 @@ const ContainedButton = ({
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: -Dimensions.get('screen').width, // Menggeser ke kiri sejauh 500 satuan (misalnya pixel)
-      duration: slideDuration, // Durasi animasi dalam milidetik (1 detik)
+      duration: 500, // Durasi animasi dalam milidetik (1 detik)
       useNativeDriver: false, // Setel false jika Anda ingin menggunakan layout animation
+      delay: slideDuration,
     }).start();
   }, [fadeAnim]);
 
