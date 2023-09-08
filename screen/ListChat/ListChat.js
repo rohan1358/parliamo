@@ -8,6 +8,7 @@ import {
   TextInput,
   Dimensions,
   Animated,
+  Image,
 } from 'react-native';
 
 import OutlineButton from '../../component/OutlineButton';
@@ -15,7 +16,10 @@ import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {FlatList} from 'react-native-gesture-handler';
 import {makeId} from '../../utils';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {blue, lightblue} from '../../assets/color/color';
+import {blue, lightblue, yellow} from '../../assets/color/color';
+import LottieView from 'lottie-react-native';
+import {imageDummy1} from '../../assets/image/imageDummy';
+import Svg, {Path} from 'react-native-svg';
 
 const DATA = [
   {
@@ -378,6 +382,8 @@ const data = [
   },
 ];
 
+const listChats = true;
+
 const ListChat = () => {
   const navigation = useNavigation();
 
@@ -421,6 +427,9 @@ const ListChat = () => {
             }}>
             Parliamo
           </Text>
+          <TouchableOpacity activeOpacity={0.5}>
+            <Icon name="account-multiple" size={30} color={lightblue[100]} />
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               setSearchComp(true);
@@ -434,27 +443,48 @@ const ListChat = () => {
             <Icon name="dots-vertical" size={30} color={lightblue[100]} />
           </TouchableOpacity>
         </View>
-
-        <FlatList
-          data={data}
-          renderItem={({item, index}) => {
-            return (
-              <OutlineButton
-                newMessage={item.newMessage}
-                user={item.user}
-                message={item.message}
-                time={item.time}
-                slideDuration={index * 500}
-                key={item.id}
-                you={item.you}
-                onPress={() => {
-                  navigation.navigate('ChatRoom');
-                }}
-              />
-            );
-          }}
-          keyExtractor={item => item.id}
-        />
+        <ListUserParliamo />
+        {/* {listChats ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: lightblue[100],
+            }}>
+            <LottieView
+              source={require('./lottie-empty.json')}
+              autoPlay
+              loop
+              style={{
+                height: 300,
+                width: 300,
+              }}
+              speed={0.6}
+            />
+          </View>
+        ) : (
+          <FlatList
+            data={data}
+            renderItem={({item, index}) => {
+              return (
+                <OutlineButton
+                  newMessage={item.newMessage}
+                  user={item.user}
+                  message={item.message}
+                  time={item.time}
+                  slideDuration={index * 500}
+                  key={item.id}
+                  you={item.you}
+                  onPress={() => {
+                    navigation.navigate('ChatRoom');
+                  }}
+                />
+              );
+            }}
+            keyExtractor={item => item.id}
+          />
+        )} */}
       </SafeAreaView>
     </>
   );
@@ -606,6 +636,102 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+const ListUserParliamo = () => {
+  return (
+    <View
+      style={{
+        flex: 1,
+      }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          // backgroundColor: lightblue[200],
+          // borderRadius: 20,
+          alignItems: 'center',
+          shadowColor: lightblue[800],
+          shadowOffset: {
+            width: 0,
+            height: 3,
+          },
+          shadowOpacity: 0.17,
+          shadowRadius: 3.05,
+          elevation: 4,
+          position: 'relative',
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 15,
+          }}>
+          <View>
+            <Image
+              source={{
+                uri: imageDummy1,
+              }}
+              height={50}
+              width={50}
+              borderRadius={50}
+            />
+          </View>
+          <View
+            style={{
+              flex: 1,
+              paddingHorizontal: 20,
+            }}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+              }}>
+              Name
+            </Text>
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: '600',
+              }}>
+              Web Developer
+            </Text>
+          </View>
+          <View>
+            <Icon
+              name="account-multiple-plus"
+              size={30}
+              color={lightblue[900]}
+            />
+            {/* <Icon
+              name="account-multiple-minus"
+              size={30}
+              color={lightblue[900]}
+            />
+            <Icon
+              name="account-multiple-check"
+              size={30}
+              color={lightblue[900]}
+            /> */}
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+// const Waves = () => {
+//   return (
+//     <Svg
+//       xmlns="http://www.w3.org/2000/svg"
+//       viewBox={`0 0 1440 320`}
+//       width="100%"
+//       height="100%">
+//       <Path
+//         fill="#0099ff"
+//         fill-opacity="1"
+//         d="M0,0L48,48C96,96,192,192,288,202.7C384,213,480,139,576,117.3C672,96,768,128,864,133.3C960,139,1056,117,1152,117.3C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></Path>
+//     </Svg>
+//   );
+// };
 
 const ListChatScreen = () => {
   const focus = useIsFocused();

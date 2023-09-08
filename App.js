@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import ChatScreen from './ChatScreen';
@@ -9,14 +9,19 @@ import Login from './screen/login/Login';
 import Settings from './screen/Settings/Settings';
 import MyProfile from './screen/MyProfile/MyProfile';
 import QrCode from './screen/QrCode/QrCode';
+// import VideoCall from './screen/VideoCall/VideoCall';
+import NewVideoCall from './screen/NewVIdeoCall/NewVideoCall';
+import MainRegister from './screen/Register/Register';
+// import VideCall2 from './screen/VideoCall/VideoCall2';
 
 const Stack = createStackNavigator();
 
 const App = () => {
+  useEffect(() => {}, []);
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="QrCode"
+        initialRouteName="ListChat"
         screenOptions={{headerShown: false}}>
         <Stack.Screen
           name="Chat"
@@ -44,9 +49,14 @@ const App = () => {
           options={{title: 'Login'}}
         />
         <Stack.Screen
+          name="Register"
+          component={MainRegister}
+          options={{title: 'Register'}}
+        />
+        <Stack.Screen
           name="Settings"
           component={Settings}
-          options={{title: 'Login'}}
+          options={{title: 'Settings'}}
         />
         <Stack.Screen
           name="MyProfile"
@@ -57,6 +67,11 @@ const App = () => {
           name="QrCode"
           component={QrCode}
           options={{title: 'QrCode', animationEnabled: false}}
+        />
+        <Stack.Screen
+          name="VideCall"
+          component={NewVideoCall}
+          options={{title: 'VideoCall', animationEnabled: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
