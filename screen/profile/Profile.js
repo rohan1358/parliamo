@@ -147,7 +147,7 @@ const Profile = () => {
               alignItems: 'center',
             }}
             onPress={() => {
-              navigation.navigate('ChatRoom');
+              navigation.goBack();
             }}>
             <Icon color={lightblue[100]} name="arrow-left" size={30} />
           </TouchableOpacity>

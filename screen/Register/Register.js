@@ -18,6 +18,7 @@ import parliamoImg from '../../assets/image/parliamo.png';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {db} from '../VideoCall/utilities/firebase';
+import {keystorage, storeData} from '../../storage';
 
 const textParliamo = ['P', 'A', 'R', 'L', 'I', 'A', 'M', 'O'];
 
@@ -164,11 +165,21 @@ const Register = () => {
   const onRegister = async ({values = value}) => {
     setDisableBtn(true);
     try {
-      const docRef = db.collection('users').doc();
-      await docRef.set({
+      const docRef = db.collection('users');
+      const setDoc = await docRef.add({
         name: values.name,
         email: values.email,
         password: values.password,
+      });
+
+      await storeData({
+        key: keystorage.login,
+        value: {
+          name: values.name,
+          email: values.email,
+          password: values.password,
+          id: setDoc.id,
+        },
       });
       navigation.navigate('ListChat');
     } catch (error) {
@@ -288,6 +299,7 @@ const Register = () => {
             ]}>
             <Text style={styles.label}>Name</Text>
             <TextInput
+              autoCapitalize="none"
               style={styles.textInput}
               onChangeText={e => handleChangeText({value: e, name: 'name'})}
             />
@@ -305,6 +317,8 @@ const Register = () => {
             ]}>
             <Text style={styles.label}>Email</Text>
             <TextInput
+              autoCapitalize="none"
+              keyboardType="email-address"
               style={styles.textInput}
               onChangeText={e => handleChangeText({value: e, name: 'email'})}
             />

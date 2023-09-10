@@ -12,6 +12,7 @@ import QrCode from './screen/QrCode/QrCode';
 // import VideoCall from './screen/VideoCall/VideoCall';
 import NewVideoCall from './screen/NewVIdeoCall/NewVideoCall';
 import MainRegister from './screen/Register/Register';
+import MainListParliamoUser from './screen/ListParliamoUser/ListParliamoUser';
 // import VideCall2 from './screen/VideoCall/VideoCall2';
 
 const Stack = createStackNavigator();
@@ -21,7 +22,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="ListChat"
+        initialRouteName="Login"
         screenOptions={{headerShown: false}}>
         <Stack.Screen
           name="Chat"
@@ -72,6 +73,11 @@ const App = () => {
           name="VideCall"
           component={NewVideoCall}
           options={{title: 'VideoCall', animationEnabled: false}}
+        />
+        <Stack.Screen
+          name="ListParliamoUser"
+          component={MainListParliamoUser}
+          options={{title: 'ListParliamoUser', animationEnabled: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

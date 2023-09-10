@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -10,26 +10,54 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {blue, darkBlue, lightblue} from '../assets/color/color';
+import {db} from '../screen/VideoCall/utilities/firebase';
 
 const ContainedButton = ({
   user = 'Name User',
   message = 'Message',
-  time = '12.25',
+  // time = '12.25',
   onPress,
   you = false,
   newMessage = false,
   slideDuration = 1000,
+  id = '',
+  times,
 }) => {
+  const [detail, setDetail] = useState({});
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-
+  const [time, setTime] = useState('');
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: -Dimensions.get('screen').width, // Menggeser ke kiri sejauh 500 satuan (misalnya pixel)
-      duration: 500, // Durasi animasi dalam milidetik (1 detik)
+      duration: 250, // Durasi animasi dalam milidetik (1 detik)
       useNativeDriver: false, // Setel false jika Anda ingin menggunakan layout animation
       delay: slideDuration,
     }).start();
   }, [fadeAnim]);
+
+  useEffect(() => {
+    db.doc(`users/${id}`)
+      .get()
+      .then(res => {
+        setDetail(res.data());
+      });
+  }, []);
+
+  useEffect(() => {
+    // Konversi Timestamp ke Date
+    const date = times.toDate();
+
+    // Dapatkan jam dan menit
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    // Format waktu menjadi hh:mm
+    setTime(
+      `${hours.toString().padStart(2, '0')}:${minutes
+        .toString()
+        .padStart(2, '0')}`,
+    );
+  }, []);
 
   return (
     <Animated.View style={{transform: [{translateX: fadeAnim}]}}>
@@ -54,7 +82,7 @@ const ContainedButton = ({
             marginHorizontal: 10,
             flex: 1,
           }}>
-          <Text style={styles.text}>{user}</Text>
+          <Text style={styles.text}>{detail.name}</Text>
           <Text style={styles.text}>{message} </Text>
         </View>
         <View

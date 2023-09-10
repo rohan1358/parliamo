@@ -8,10 +8,11 @@ import {
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {lightblue} from '../../assets/color/color';
+import {lightblue, red} from '../../assets/color/color';
 import {imageDummy1} from '../../assets/image/imageDummy';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useNavigation, useIsFocused} from '@react-navigation/native';
+import {keystorage, removeData} from '../../storage';
 
 // const sleep = ms => {
 //   return new Promise(resolve => setTimeout(resolve, ms));
@@ -155,6 +156,12 @@ const Settings = () => {
     },
   });
 
+  const handleLogout = () => {
+    removeData({key: keystorage.login}).then(res => {
+      navigation.navigate('Login');
+    });
+  };
+
   return (
     <>
       <Animated.View
@@ -280,6 +287,24 @@ const Settings = () => {
           ) : (
             <></>
           )}
+          <TouchableOpacity
+            style={{
+              backgroundColor: red[400],
+              padding: 10,
+              alignItems: 'center',
+              alignSelf: 'center',
+              borderRadius: 10,
+            }}
+            onPress={() => handleLogout()}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: '500',
+                color: lightblue[100],
+              }}>
+              Logout
+            </Text>
+          </TouchableOpacity>
         </>
       </Animated.View>
 

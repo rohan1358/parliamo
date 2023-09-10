@@ -14,6 +14,9 @@ import {lightblue} from '../../assets/color/color';
 import parliamoImg from '../../assets/image/parliamo.png';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {db} from '../VideoCall/utilities/firebase';
+import {getData, keystorage, storeData} from '../../storage';
+import BackroundBubble from '../../component/BackgroundBubble';
 
 const sleep = ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -28,6 +31,8 @@ const textParliamo = ['P', 'A', 'R', 'L', 'I', 'A', 'M', 'O'];
 const Login = () => {
   const [currentText, setCurrentText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [value, setValue] = useState({email: '', password: ''});
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim2 = useRef(new Animated.Value(0)).current;
@@ -115,8 +120,36 @@ const Login = () => {
     }
   }, [currentIndex, textParliamo, fadeAnim, slideAnim, fadeAnim2]);
 
+  const handleLogin = async () => {
+    db.collection('users')
+      .where('email', '==', value.email)
+      .where('password', '==', value.password)
+      .get()
+      .then(res => {
+        storeData({
+          key: keystorage.login,
+          value: {...res.docs[0].data(), id: res.docs[0].id},
+        });
+        navigation.navigate('ListChat');
+      })
+      .catch(err => {
+        console.log('err', err);
+      });
+  };
+
+  useEffect(() => {
+    // handleLogin();
+  }, []);
+
+  const handleChange = (values = '', names = '') => {
+    setValue(value => {
+      return {...value, [names]: values};
+    });
+  };
+
   return (
     <View style={styles.container}>
+      <BackroundBubble />
       <Text
         style={{
           fontWeight: '700',
@@ -178,8 +211,13 @@ const Login = () => {
               styles.containerTextInput,
               {left: -Dimensions.get('screen').width},
             ]}>
-            <Text style={styles.label}>Username</Text>
-            <TextInput style={styles.textInput} />
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              keyboardType="email-address"
+              style={styles.textInput}
+              onChangeText={e => handleChange(e, 'email')}
+              autoCapitalize="none"
+            />
           </View>
         </Animated.View>
 
@@ -193,7 +231,11 @@ const Login = () => {
               {left: -Dimensions.get('screen').width},
             ]}>
             <Text style={styles.label}>Password</Text>
-            <TextInput style={styles.textInput} secureTextEntry={true} />
+            <TextInput
+              style={styles.textInput}
+              secureTextEntry={true}
+              onChangeText={e => handleChange(e, 'password')}
+            />
           </View>
         </Animated.View>
 
@@ -234,7 +276,7 @@ const Login = () => {
             bottom: -200,
           }}
           onPress={() => {
-            navigation.navigate('ListChat');
+            handleLogin();
           }}>
           <Text
             style={{
@@ -244,6 +286,44 @@ const Login = () => {
               letterSpacing: 1,
             }}>
             Login
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      <Text
+        style={{
+          fontSize: 20,
+          color: lightblue[400],
+          fontWeight: 'bold',
+        }}>
+        Or
+      </Text>
+
+      <Animated.View
+        style={{
+          width: '50%',
+          transform: [{translateY: slideAnim5}],
+        }}>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          style={{
+            backgroundColor: lightblue[400],
+            alignItems: 'center',
+            borderRadius: 5,
+            padding: 10,
+            bottom: -200,
+          }}
+          onPress={() => {
+            navigation.navigate('Register');
+          }}>
+          <Text
+            style={{
+              color: lightblue[100],
+              fontWeight: '500',
+              fontSize: 18,
+              letterSpacing: 1,
+            }}>
+            Register
           </Text>
         </TouchableOpacity>
       </Animated.View>
@@ -318,9 +398,15 @@ const GetReady = () => {
   // const isFocused = useIsFocused();
 
   const [focus, setFocus] = useState(false);
+  const navigation = useNavigation();
 
   useFocusEffect(
     React.useCallback(() => {
+      getData({key: keystorage.login}).then(res => {
+        if (res) {
+          navigation.navigate('ListChat');
+        }
+      });
       setFocus(true);
 
       return () => setFocus(false);

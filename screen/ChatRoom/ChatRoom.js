@@ -1,19 +1,51 @@
-import {View, Text, Dimensions, Alert} from 'react-native';
+import {View, Text, Dimensions, Alert, FlatList, Keyboard} from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TouchableOpacity} from 'react-native';
 import {Image} from 'react-native';
 import {imageDummy1} from '../../assets/image/imageDummy';
 import {TextInput, Animated} from 'react-native';
-import {blue, darkBlue, lightblue, red} from '../../assets/color/color';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {blue, darkBlue, lightblue, red, yellow} from '../../assets/color/color';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
+import {db} from '../VideoCall/utilities/firebase';
+import {getData, keystorage, storeData} from '../../storage';
+import {firebase} from '@react-native-firebase/messaging';
 
 const ChatRoom = () => {
-  const [number, onChangeNumber] = React.useState('');
+  const textInputRef = useRef();
+
+  // const [number, setMessage] = React.useState('');
   const [showMenu, setShowMenu] = useState(false);
   const [layoutButtonMenu, setLayoutButtonMenu] = useState({});
 
+  const [listMessage, setListMessage] = useState([]);
+
   const navigation = useNavigation();
+
+  const route = useRoute();
+
+  useEffect(() => {}, []);
+
+  const [keyboardStatus, setKeyboardStatus] = useState('');
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () =>
+      setKeyboardStatus('display'),
+    );
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () =>
+      setKeyboardStatus('none'),
+    );
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  const checkKeyboards = () => {
+    if (keyboardStatus === 'none') textInputRef.current?.blur();
+
+    return true;
+  };
 
   React.useEffect(
     () =>
@@ -58,31 +90,270 @@ const ChatRoom = () => {
       duration: 500,
       useNativeDriver: false,
     }).start(cb => {
-      Animated.timing(slideAnim5, {
-        toValue: Dimensions.get('screen').width,
+      Animated.timing(slideAnim4, {
+        toValue: 100,
         duration: 500,
         useNativeDriver: false,
       }).start(cb => {});
-      Animated.timing(slideAnim6, {
-        toValue: Dimensions.get('screen').width,
-        duration: 1000,
-        useNativeDriver: false,
-      }).start(cb => {
-        Animated.timing(slideAnim4, {
-          toValue: 100,
-          duration: 1000,
-          useNativeDriver: false,
-        }).start(cb => {
-          Animated.timing(slideAnim4, {
-            toValue: 100,
-            duration: 1000,
-            useNativeDriver: false,
-          }).start(cb => {});
-        });
-      });
     });
   }, [slideAnim, slideAnim2, slideAnim3]);
 
+  const [message, setMessage] = useState('');
+
+  const getMessage = async () => {
+    let dataLogin = await getData({key: keystorage.login});
+    db.collection('message')
+      .doc(`${dataLogin.id}-${route.params.id}`)
+      .onSnapshot(async documentSnapshot => {
+        if (
+          documentSnapshot.data() &&
+          Object.keys(documentSnapshot.data()).length
+        ) {
+          const dataArray = [];
+
+          for (const key in documentSnapshot.data()) {
+            if (Object.hasOwnProperty.call(documentSnapshot.data(), key)) {
+              dataArray.push({...documentSnapshot.data()[key], id: key});
+            }
+          }
+          let newData = dataArray.sort((a, b) => a.time - b.time);
+          if (newData !== listMessage) {
+            await setListMessage(dataArray.sort((a, b) => a.time - b.time));
+
+            if (isAtBottom) {
+              scrollToBottom();
+            }
+          }
+        } else {
+          db.doc(`listChat/${dataLogin.id}`).update({
+            [route.params.id]: firebase.firestore.FieldValue.delete(),
+          });
+          setListMessage([]);
+        }
+      });
+  };
+
+  const [dataLogin, setDataLogin] = useState({});
+  const flatListRef = useRef(null);
+
+  const scrollToBottom = () => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({animated: true});
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
+
+  const sendMessage = async () => {
+    let time = new Date().getTime();
+    if (dataLogin) {
+      let doc = await db
+        .doc(`message/${dataLogin.id}-${route.params.id}`)
+        .get();
+
+      if (doc.exists) {
+        readMessage(dataLogin);
+        db.collection('message')
+          .doc(`${dataLogin.id}-${route.params.id}`)
+          .update({
+            [time]: {
+              from: dataLogin.id,
+              message: message,
+              read: true,
+              time: new Date(),
+              to: route.params.id,
+            },
+          });
+
+        await db
+          .collection('message')
+          .doc(`${route.params.id}-${dataLogin.id}`)
+          .update({
+            [time]: {
+              from: dataLogin.id,
+              message: message,
+              read: true,
+              time: new Date(),
+              to: route.params.id,
+            },
+          });
+
+        setMessage('');
+        scrollToBottom();
+      } else {
+        newReadMessage(dataLogin);
+
+        db.collection('message')
+          .doc(`${dataLogin.id}-${route.params.id}`)
+          .set({
+            [time]: {
+              from: dataLogin.id,
+              message: message,
+              read: true,
+              time: new Date(),
+              to: route.params.id,
+            },
+          });
+
+        await db
+          .collection('message')
+          .doc(`${route.params.id}-${dataLogin.id}`)
+          .set({
+            [time]: {
+              from: dataLogin.id,
+              message: message,
+              read: true,
+              time: new Date(),
+              to: route.params.id,
+            },
+          });
+
+        setMessage('');
+        scrollToBottom();
+      }
+
+      let listChatMe = await db.doc(`listChat/${dataLogin.id}`).get();
+      let listChatHim = await db.doc(`listChat/${route.params.id}`).get();
+
+      if (listChatMe.exists) {
+        db.collection('listChat')
+          .doc(`${dataLogin.id}`)
+          .update({
+            [route.params.id]: {
+              idSender: route.params.id,
+              lastMessage: message,
+              read: false,
+              time: new Date(),
+            },
+          });
+      } else {
+        db.collection('listChat')
+          .doc(`${dataLogin.id}`)
+          .set({
+            [route.params.id]: {
+              idSender: route.params.id,
+              lastMessage: message,
+              read: false,
+              time: new Date(),
+            },
+          });
+      }
+
+      if (listChatHim.exists) {
+        await db
+          .collection('listChat')
+          .doc(`${route.params.id}`)
+          .update({
+            [dataLogin.id]: {
+              idSender: dataLogin.id,
+              lastMessage: message,
+              read: false,
+              time: new Date(),
+            },
+          });
+      } else {
+        await db
+          .collection('listChat')
+          .doc(`${route.params.id}`)
+          .set({
+            [dataLogin.id]: {
+              idSender: dataLogin.id,
+              lastMessage: message,
+              read: false,
+              time: new Date(),
+            },
+          });
+      }
+    }
+  };
+
+  const readMessage = async dataLogin => {
+    db.collection(`listChat`)
+      .doc(dataLogin.id)
+      .update({
+        [route.params.id]: {
+          lastMessage: message,
+          idSender: dataLogin.id,
+          time: new Date(),
+          read: true,
+        },
+      })
+      .then()
+      .catch(err => {});
+
+    db.collection(`listChat`)
+      .doc(route.params.id)
+      .update({
+        [dataLogin.id]: {
+          lastMessage: message,
+          idSender: dataLogin.id,
+          time: new Date(),
+          read: true,
+        },
+      })
+      .then()
+      .catch(err => {});
+  };
+
+  const newReadMessage = async dataLogin => {
+    db.collection(`listChat`)
+      .doc(dataLogin.id)
+      .set({
+        [route.params.id]: {
+          lastMessage: message,
+          idSender: dataLogin.id,
+          time: new Date(),
+          read: true,
+        },
+      })
+      .then()
+      .catch(err => {});
+
+    db.collection(`listChat`)
+      .doc(route.params.id)
+      .set({
+        [dataLogin.id]: {
+          lastMessage: message,
+          idSender: dataLogin.id,
+          time: new Date(),
+          read: true,
+        },
+      })
+      .then()
+      .catch(err => {});
+  };
+
+  useEffect(() => {
+    getData({key: keystorage.login}).then(dataLogin => {
+      setDataLogin(dataLogin);
+    });
+  }, []);
+
+  useEffect(() => {
+    getMessage();
+  }, []);
+
+  const [isAtBottom, setIsAtBottom] = useState(false);
+
+  const onScroll = event => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const viewHeight = event.nativeEvent.layoutMeasurement.height;
+
+    // Menghitung jarak dari bagian bawah
+    const distanceFromBottom = contentHeight - offsetY - viewHeight;
+
+    // Toleransi jarak dari bawah sebelum dianggap berada di bagian bawah
+    const tolerance = 10;
+    // console.log(distanceFromBottom, tolerance);
+    if (distanceFromBottom <= tolerance) {
+      setIsAtBottom(true);
+    } else {
+      setIsAtBottom(false);
+    }
+  };
   return (
     <>
       <View
@@ -114,7 +385,7 @@ const ChatRoom = () => {
                 left: -100,
               }}
               onPress={() => {
-                navigation.navigate('ListChat');
+                navigation.goBack();
               }}>
               <Icon color={lightblue[100]} name="arrow-left" size={30} />
               <Image
@@ -199,69 +470,23 @@ const ChatRoom = () => {
           }}>
           {/* message 1 */}
 
-          <Animated.View
-            style={{
-              left: slideAnim5,
-            }}>
-            <View
-              style={{
-                alignItems: 'flex-start',
-                left: -Dimensions.get('screen').width,
-              }}>
-              <View
-                style={{
-                  backgroundColor: lightblue[800],
-
-                  padding: 5,
-                  borderRadius: 5,
-                }}>
-                <Text
-                  style={{
-                    color: lightblue[50],
-                  }}>
-                  Message 1
-                </Text>
-                <Text
-                  style={{
-                    color: lightblue[100],
-                  }}>
-                  10.12
-                </Text>
-              </View>
-            </View>
-          </Animated.View>
-
-          <Animated.View
-            style={{
-              right: slideAnim6,
-            }}>
-            {/* message 2 */}
-            <View
-              style={{
-                alignItems: 'flex-end',
-                right: -Dimensions.get('screen').width,
-              }}>
-              <View
-                style={{
-                  backgroundColor: lightblue[700],
-                  padding: 5,
-                  borderRadius: 5,
-                }}>
-                <Text
-                  style={{
-                    color: lightblue[50],
-                  }}>
-                  Message 2
-                </Text>
-                <Text
-                  style={{
-                    color: lightblue[100],
-                  }}>
-                  10.12
-                </Text>
-              </View>
-            </View>
-          </Animated.View>
+          <FlatList
+            ref={flatListRef}
+            data={listMessage}
+            renderItem={({item, index}) =>
+              item.from === dataLogin.id ? (
+                <FromMe item={item} index={index} />
+              ) : (
+                <FromHim item={item} index={index} />
+              )
+            }
+            keyExtractor={item => {
+              // console.log();
+              return item.time.seconds;
+            }}
+            // onEndReached={() => console.log('end')}
+            onScroll={onScroll}
+          />
         </View>
 
         <Animated.View
@@ -276,9 +501,11 @@ const ChatRoom = () => {
               bottom: -100,
             }}>
             <TextInput
-              onChangeText={onChangeNumber}
-              value={number}
-              placeholder="useless placeholder"
+              ref={textInputRef}
+              onPressIn={checkKeyboards}
+              onChangeText={setMessage}
+              value={message}
+              placeholder="type messages"
               style={{
                 borderColor: lightblue[400],
                 borderWidth: 1,
@@ -287,7 +514,7 @@ const ChatRoom = () => {
                 padding: 5,
               }}
             />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => sendMessage()}>
               <Icon name="send" size={40} color={lightblue[400]} />
             </TouchableOpacity>
           </View>
@@ -352,6 +579,150 @@ const Menu = ({show, setShow, layoutPosition}) => {
             Blokir <Icon name="block-helper" size={20} />
           </Text>
         </TouchableOpacity>
+      </View>
+    </Animated.View>
+  );
+};
+
+const FromMe = ({item}) => {
+  const slide = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  useEffect(() => {
+    Animated.timing(slide, {
+      toValue: Dimensions.get('screen').width,
+      duration: 1000,
+      useNativeDriver: false,
+    }).start();
+  }, []);
+
+  const route = useRoute();
+
+  const removeMessage = async () => {
+    // Create a document reference
+    const dataLogin = await getData({key: keystorage.login});
+    const cityRef1 = db
+      .collection('message')
+      .doc(`${dataLogin.id}-${route.params.id}`);
+
+    // Remove the 'capital' field from the document
+    await cityRef1.update({
+      [item.id]: firebase.firestore.FieldValue.delete(),
+    });
+  };
+
+  return (
+    <Animated.View
+      style={{
+        right: slide,
+        marginVertical: 2,
+      }}>
+      {/* message 2 */}
+
+      <View
+        style={{
+          right: -Dimensions.get('screen').width,
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+        }}>
+        <View
+          style={{
+            // position: 'absolute',
+            // left: 0,
+            zIndex: 1,
+          }}>
+          <TouchableOpacity onPress={() => removeMessage()}>
+            <Icon name="trash-can" size={40} color={lightblue[700]} />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            backgroundColor: lightblue[700],
+            padding: 5,
+            borderRadius: 5,
+          }}>
+          <Text
+            style={{
+              color: lightblue[50],
+            }}>
+            {item.message}
+          </Text>
+          <Text
+            style={{
+              color: lightblue[100],
+            }}>
+            10.12
+          </Text>
+        </View>
+      </View>
+    </Animated.View>
+  );
+};
+
+const FromHim = ({item, index}) => {
+  const slide = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  useEffect(() => {
+    Animated.timing(slide, {
+      toValue: Dimensions.get('screen').width,
+      duration: 1000,
+      useNativeDriver: false,
+    }).start();
+  }, []);
+
+  const route = useRoute();
+
+  const removeMessage = async () => {
+    // Create a document reference
+    const dataLogin = await getData({key: keystorage.login});
+    const cityRef1 = db
+      .collection('message')
+      .doc(`${dataLogin.id}-${route.params.id}`);
+
+    // Remove the 'capital' field from the document
+    await cityRef1.update({
+      [item.id]: firebase.firestore.FieldValue.delete(),
+    });
+  };
+  return (
+    <Animated.View
+      style={{
+        left: slide,
+        marginVertical: 2,
+      }}>
+      <View
+        style={{
+          alignItems: 'flex-start',
+          left: -Dimensions.get('screen').width,
+          flexDirection: 'row',
+        }}>
+        <View
+          style={{
+            backgroundColor: lightblue[800],
+
+            padding: 5,
+            borderRadius: 5,
+          }}>
+          <Text
+            style={{
+              color: lightblue[50],
+            }}>
+            {item.message}
+          </Text>
+          <Text
+            style={{
+              color: lightblue[100],
+            }}>
+            10.12
+          </Text>
+        </View>
+        <View
+          style={{
+            // position: 'absolute',
+            // left: 0,
+            zIndex: 1,
+          }}>
+          <TouchableOpacity onPress={() => removeMessage()}>
+            <Icon name="trash-can" size={40} color={lightblue[700]} />
+          </TouchableOpacity>
+        </View>
       </View>
     </Animated.View>
   );
