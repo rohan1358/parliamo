@@ -12,34 +12,34 @@ import notifee, {AndroidImportance} from '@notifee/react-native';
 
 const store = createStore(rootReducer); // Buat store dengan root reducer
 
-notifee.registerForegroundService(notification => {
-  return new Promise(async () => {});
-});
+// notifee.registerForegroundService(notification => {
+//   return new Promise(async () => {});
+// });
 
-const notefeeeeeee = async () => {
-  try {
-    const channelId = await notifee.createChannel({
-      id: 'screen_capture',
-      name: 'Screen Capture',
-      lights: false,
-      vibration: false,
-      importance: AndroidImportance.DEFAULT,
-    });
+// const notefeeeeeee = async () => {
+//   try {
+//     const channelId = await notifee.createChannel({
+//       id: 'screen_capture',
+//       name: 'Screen Capture',
+//       lights: false,
+//       vibration: false,
+//       importance: AndroidImportance.DEFAULT,
+//     });
 
-    await notifee.displayNotification({
-      title: 'Screen Capture',
-      body: 'This notification will be here until you stop capturing.',
-      android: {
-        channelId,
-        asForegroundService: true,
-      },
-    });
-  } catch (err) {
-    // Handle Error
-  }
-};
+//     await notifee.displayNotification({
+//       title: 'Screen Capture',
+//       body: 'This notification will be here until you stop capturing.',
+//       android: {
+//         channelId,
+//         asForegroundService: true,
+//       },
+//     });
+//   } catch (err) {
+//     // Handle Error
+//   }
+// };
 
-notefeeeeeee();
+// notefeeeeeee();
 const Root = () => {
   return (
     <Provider store={store}>

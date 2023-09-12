@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {lightblue} from '../../assets/color/color';
+import {lightblue, yellow} from '../../assets/color/color';
 
 import parliamoImg from '../../assets/image/parliamo.png';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {db} from '../VideoCall/utilities/firebase';
 import {getData, keystorage, storeData} from '../../storage';
 import BackroundBubble from '../../component/BackgroundBubble';
+import ModalFailedLogin from './ModalFailedLogin';
 
 const sleep = ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -120,7 +121,20 @@ const Login = () => {
     }
   }, [currentIndex, textParliamo, fadeAnim, slideAnim, fadeAnim2]);
 
+  const [modalFailedLogin, setModalFailedLogin] = useState(false);
+
+  const [fieldEmailInvalid, setFieldEmailInvalid] = useState(false);
+  const [fieldPasswordInvalid, setFieldPasswordInvalid] = useState(false);
+
   const handleLogin = async () => {
+    if (value.email === '') {
+      setFieldEmailInvalid(true);
+      return;
+    }
+    if (value.password === '') {
+      setFieldPasswordInvalid(true);
+      return;
+    }
     db.collection('users')
       .where('email', '==', value.email)
       .where('password', '==', value.password)
@@ -132,14 +146,17 @@ const Login = () => {
         });
         navigation.navigate('ListChat');
       })
-      .catch(err => {});
+      .catch(err => {
+        setModalFailedLogin(true);
+      });
   };
 
-  useEffect(() => {
-    // handleLogin();
-  }, []);
-
   const handleChange = (values = '', names = '') => {
+    if (names === 'email') {
+      setFieldEmailInvalid(false);
+    } else {
+      setFieldPasswordInvalid(false);
+    }
     setValue(value => {
       return {...value, [names]: values};
     });
@@ -148,6 +165,10 @@ const Login = () => {
   return (
     <View style={styles.container}>
       <BackroundBubble />
+      <ModalFailedLogin
+        modalVisible={modalFailedLogin}
+        setModalVisible={setModalFailedLogin}
+      />
       <Text
         style={{
           fontWeight: '700',
@@ -216,6 +237,17 @@ const Login = () => {
               onChangeText={e => handleChange(e, 'email')}
               autoCapitalize="none"
             />
+            {fieldEmailInvalid ? (
+              <Text
+                style={{
+                  fontWeight: 'bold',
+                  color: yellow[500],
+                }}>
+                Masukan email anda!
+              </Text>
+            ) : (
+              <></>
+            )}
           </View>
         </Animated.View>
 
@@ -235,6 +267,17 @@ const Login = () => {
               secureTextEntry={true}
               onChangeText={e => handleChange(e, 'password')}
             />
+            {fieldPasswordInvalid ? (
+              <Text
+                style={{
+                  fontWeight: 'bold',
+                  color: yellow[500],
+                }}>
+                Masukan password anda!
+              </Text>
+            ) : (
+              <></>
+            )}
           </View>
         </Animated.View>
 

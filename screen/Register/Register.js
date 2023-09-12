@@ -18,8 +18,9 @@ import parliamoImg from '../../assets/image/parliamo.png';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {db} from '../VideoCall/utilities/firebase';
-import {keystorage, storeData} from '../../storage';
+import {getData, keystorage, storeData} from '../../storage';
 import BackroundBubble from '../../component/BackgroundBubble';
+import ModalFailedRegister from './ModalFailedRegister';
 
 const textParliamo = ['P', 'A', 'R', 'L', 'I', 'A', 'M', 'O'];
 
@@ -40,6 +41,10 @@ const Register = () => {
     email: '',
     password: '',
   });
+
+  const [fieldEmailInvalid, setFieldEmailInvalid] = useState(false);
+  const [fieldPasswordInvalid, setFieldPasswordInvalid] = useState(false);
+  const [fieldNameInvalid, setFieldNameInvalid] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim2 = useRef(new Animated.Value(0)).current;
@@ -135,97 +140,92 @@ const Register = () => {
     }
   }, [currentIndex, textParliamo, fadeAnim, slideAnim, fadeAnim2]);
 
-  // set data
-  const setData = async () => {
-    const docRef = db.collection('users').doc();
-    await docRef.set({
-      name: 'Ada',
-      email: 'Lovelace',
-      password: 1815,
-    });
-  };
-
   const handleChangeText = ({value = '', name = ''}) => {
+    if (name) {
+      setFieldNameInvalid(false);
+    }
+    if (name) {
+      setFieldEmailInvalid(false);
+    }
+    if (name) {
+      setFieldPasswordInvalid(false);
+    }
     setValue(stateValue => {
       return {...stateValue, [name]: value};
     });
   };
 
-  useEffect(() => {
-    // setData();
-    // getData();
-  }, []);
+  const [modalRegisterFailed, setModalRegisterFailed] = useState(false);
 
   const onRegister = async ({values = value}) => {
+    if (values.name === '') {
+      setFieldNameInvalid(true);
+      return;
+    }
+    if (values.email === '') {
+      setFieldEmailInvalid(true);
+      return;
+    }
+    if (values.password === '') {
+      setFieldPasswordInvalid(true);
+      return;
+    }
     setDisableBtn(true);
     try {
-      const docRef = db.collection('users');
-      const setDoc = await docRef.add({
-        name: values.name,
-        email: values.email,
-        password: values.password,
-      });
+      const checkuser = await db
+        .collection('users')
+        .where('email', '==', values.email)
+        .get();
 
-      await storeData({
-        key: keystorage.login,
-        value: {
+      if (checkuser.empty) {
+        // .then(res => {
+        //   if(res.empty){
+
+        //   }
+        //   res.docs.forEach(res => {
+        //     console.log(res.data());
+        //   });
+        // })
+        // .catch(err => {
+        //   console.log('err', err);
+        // });
+
+        const docRef = db.collection('users');
+        const setDoc = await docRef.add({
           name: values.name,
           email: values.email,
           password: values.password,
-          id: setDoc.id,
-        },
-      });
-      navigation.navigate('ListChat');
+        });
+
+        await storeData({
+          key: keystorage.login,
+          value: {
+            name: values.name,
+            email: values.email,
+            password: values.password,
+            id: setDoc.id,
+          },
+        });
+        navigation.navigate('ListChat');
+      } else {
+        setModalRegisterFailed(true);
+        setDisableBtn(false);
+      }
     } catch (error) {
       setDisableBtn(false);
     }
   };
 
+  useEffect(() => {}, []);
+
   const [modalReject, setModalReject] = useState(false);
 
   return (
     <View style={styles.container}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalReject}
-        onRequestClose={() => {}}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: 22,
-          }}>
-          <View
-            style={{
-              margin: 20,
-              backgroundColor: 'white',
-              borderRadius: 20,
-              padding: 35,
-              alignItems: 'center',
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 4,
-              elevation: 5,
-            }}>
-            <Icon name="alert-circle" size={200} color={yellow[500]} />
-            <Text
-              style={{
-                color: yellow[600],
-                fontSize: 20,
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}>
-              email pernah digunakan, gunakan email yang belum pernah digunakan
-            </Text>
-          </View>
-        </View>
-      </Modal>
+      <ModalFailedRegister
+        modalVisible={modalRegisterFailed}
+        setModalVisible={setModalRegisterFailed}
+      />
       <BackroundBubble />
 
       <Text
@@ -295,6 +295,17 @@ const Register = () => {
               style={styles.textInput}
               onChangeText={e => handleChangeText({value: e, name: 'name'})}
             />
+            {fieldNameInvalid ? (
+              <Text
+                style={{
+                  fontWeight: 'bold',
+                  color: yellow[500],
+                }}>
+                Masukan Nama anda!
+              </Text>
+            ) : (
+              <></>
+            )}
           </View>
         </Animated.View>
 
@@ -314,6 +325,17 @@ const Register = () => {
               style={styles.textInput}
               onChangeText={e => handleChangeText({value: e, name: 'email'})}
             />
+            {fieldEmailInvalid ? (
+              <Text
+                style={{
+                  fontWeight: 'bold',
+                  color: yellow[500],
+                }}>
+                Masukan Email anda!
+              </Text>
+            ) : (
+              <></>
+            )}
           </View>
         </Animated.View>
 
@@ -333,6 +355,17 @@ const Register = () => {
               secureTextEntry={true}
               onChangeText={e => handleChangeText({value: e, name: 'password'})}
             />
+            {fieldPasswordInvalid ? (
+              <Text
+                style={{
+                  fontWeight: 'bold',
+                  color: yellow[500],
+                }}>
+                Masukan Passowrd anda!
+              </Text>
+            ) : (
+              <></>
+            )}
           </View>
         </Animated.View>
       </View>
@@ -470,9 +503,15 @@ const MainRegister = () => {
   // const isFocused = useIsFocused();
 
   const [focus, setFocus] = useState(false);
+  const navigation = useNavigation();
 
   useFocusEffect(
     React.useCallback(() => {
+      getData({key: keystorage.login}).then(res => {
+        if (res) {
+          navigation.navigate('ListChat');
+        }
+      });
       setFocus(true);
 
       return () => setFocus(false);

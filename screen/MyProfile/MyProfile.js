@@ -1,42 +1,55 @@
-import {View, Text, Image, Animated, Dimensions} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  Animated,
+  Dimensions,
+  Modal,
+  Pressable,
+} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {lightblue} from '../../assets/color/color';
+import {lightblue, yellow} from '../../assets/color/color';
 import {imageDummy1} from '../../assets/image/imageDummy';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
+import {getData, keystorage} from '../../storage';
+import ModalEdit from './ModalEdit';
 
-const listSettings = [
-  {
-    title: 'Name',
+const listSettings = ({name}) => {
+  return [
+    {
+      title: 'Name',
+      icon: 'account',
+      label: name || 'Name User',
+      description: 'Security notifications, change number',
+      id: Math.random(),
+    },
+    {
+      title: 'About',
+      icon: 'information-outline',
+      label: 'Hey there! I am using Parliamo',
+      description: '-',
+      id: Math.random(),
+    },
+    {
+      title: 'Phone',
 
-    icon: 'account',
-    label: 'Name User',
-    description: 'Security notifications, change number',
-    id: Math.random(),
-  },
-  {
-    title: 'About',
-    icon: 'information-outline',
-    label: 'Hey there! I am using Parliamo',
-    description: '-',
-    id: Math.random(),
-  },
-  {
-    title: 'Phone',
-
-    icon: 'phone',
-    label: '+62 855-2453-1474',
-    description: '-',
-    id: Math.random(),
-  },
-];
+      icon: 'phone',
+      label: '+62 855-2453-1474',
+      description: '-',
+      id: Math.random(),
+    },
+  ];
+};
 
 // const sleep = ms => {
 //   return new Promise(resolve => setTimeout(resolve, ms));
 // };
 
 const MyProfile = () => {
+  const [dataLogin, setDataLogin] = useState({});
+
   const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim2 = useRef(new Animated.Value(0)).current;
@@ -47,6 +60,45 @@ const MyProfile = () => {
   const slideAnim4 = useRef(new Animated.Value(0)).current;
 
   const [showListSettings, setShowListSettings] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  let [listSettings, setListSettings] = useState([
+    {
+      title: 'Name',
+      icon: 'account',
+      label: dataLogin.name || 'Name User',
+      description: 'This is Your Name!!',
+      id: Math.random(),
+      clickEdit: () => setModalVisible(true),
+    },
+    {
+      title: 'About',
+      icon: 'information-outline',
+      label: 'Hey there! I am using Parliamo',
+      description: '-',
+      id: Math.random(),
+    },
+    {
+      title: 'Phone',
+
+      icon: 'phone',
+      label: '+62 855-2453-1474',
+      description: '-',
+      id: Math.random(),
+    },
+  ]);
+
+  useEffect(() => {
+    const getDataLogin = async () => {
+      await getData({key: keystorage.login}).then(res => {
+        listSettings[0] = {...listSettings[0], label: res.name};
+        setListSettings(listSettings);
+        setDataLogin(res);
+      });
+    };
+    getDataLogin();
+  }, []);
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -80,20 +132,6 @@ const MyProfile = () => {
     }).start(() => {});
   }, [fadeAnim, slideAnim]);
 
-  const [size, setSize] = useState(50);
-
-  const sleep = ms => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  };
-
-  const handleSetSize = async () => {
-    for (let index = 0; index < 150; index++) {
-      // const element = array[index];
-      await sleep(0);
-      setSize(50 + index);
-    }
-  };
-
   const [animation] = useState(new Animated.Value(0));
 
   const startAnimation = () => {
@@ -123,119 +161,129 @@ const MyProfile = () => {
   });
 
   useEffect(() => {
-    handleSetSize();
     startAnimation();
   }, []);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: lightblue[700],
-      }}>
+    <>
+      <ModalEdit
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        dataLogin={dataLogin}
+      />
       <View
+        onTouchStart={() => {
+          if (modalVisible) {
+            setModalVisible(false);
+          }
+        }}
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: lightblue[600],
-          paddingVertical: 10,
-        }}>
-        <Animated.View
-          style={{
-            left: slideAnim,
-          }}>
-          <View
-            style={{
-              left: -100,
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.goBack();
-              }}>
-              <Icon name="arrow-left" size={25} color={lightblue[100]} />
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-
-        <Animated.View
-          style={{
-            top: slideAnim2,
-            flex: 1,
-          }}>
-          <View
-            style={{
-              top: -100,
-            }}>
-            <Text
-              style={{
-                fontSize: 25,
-                color: lightblue[100],
-              }}>
-              Profile
-            </Text>
-          </View>
-        </Animated.View>
-
-        <Animated.View
-          style={{
-            right: slideAnim3,
-          }}>
-          <View
-            style={{
-              right: -100,
-            }}>
-            <Icon name="magnify" size={25} color={lightblue[100]} />
-          </View>
-        </Animated.View>
-      </View>
-      <Animated.View
-        style={{
-          left: fadeAnim,
-          paddingHorizontal: 5,
-          marginVertical: 5,
+          flex: 1,
+          backgroundColor: lightblue[700],
         }}>
         <View
           style={{
-            // flexDirection: 'row',
-            justifyContent: 'center',
+            flexDirection: 'row',
             alignItems: 'center',
-            left: -Dimensions.get('screen').width / 5,
-            position: 'relative',
+            backgroundColor: lightblue[600],
+            paddingVertical: 10,
           }}>
-          <Animated.Image
-            source={{uri: imageDummy1}}
+          <Animated.View
             style={{
-              width: interpolatedScale,
-              height: interpolatedScale,
-              borderRadius: 100,
-            }}
-          />
+              left: slideAnim,
+            }}>
+            <View
+              style={{
+                left: -100,
+              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack();
+                }}>
+                <Icon name="arrow-left" size={25} color={lightblue[100]} />
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
 
           <Animated.View
             style={{
-              top: -50,
-              backgroundColor: lightblue[400],
-              left: '15%',
-              borderRadius: 50,
-              borderWidth: 3,
-              padding: 10,
-              borderColor: lightblue[50],
-              opacity: fadeAnim2,
+              top: slideAnim2,
+              flex: 1,
             }}>
-            <TouchableOpacity
+            <View
               style={{
-                alignContent: 'flex-end',
-                justifyContent: 'flex-end',
-                // position: 'absolute',
-                // top: 100,
-                // marginTop: 100,
+                top: -100,
               }}>
-              <Icon name="camera" size={30} color={lightblue[50]} />
-            </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: 25,
+                  color: lightblue[100],
+                }}>
+                Profile
+              </Text>
+            </View>
           </Animated.View>
 
-          {/* </Animated.View> */}
-          {/* <View
+          <Animated.View
+            style={{
+              right: slideAnim3,
+            }}>
+            <View
+              style={{
+                right: -100,
+              }}>
+              <Icon name="magnify" size={25} color={lightblue[100]} />
+            </View>
+          </Animated.View>
+        </View>
+        <Animated.View
+          style={{
+            left: fadeAnim,
+            paddingHorizontal: 5,
+            marginVertical: 5,
+          }}>
+          <View
+            style={{
+              // flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              left: -Dimensions.get('screen').width / 5,
+              position: 'relative',
+            }}>
+            <Animated.Image
+              source={{uri: imageDummy1}}
+              style={{
+                width: interpolatedScale,
+                height: interpolatedScale,
+                borderRadius: 100,
+              }}
+            />
+
+            <Animated.View
+              style={{
+                top: -50,
+                backgroundColor: lightblue[400],
+                left: '15%',
+                borderRadius: 50,
+                borderWidth: 3,
+                padding: 10,
+                borderColor: lightblue[50],
+                opacity: fadeAnim2,
+              }}>
+              <TouchableOpacity
+                style={{
+                  alignContent: 'flex-end',
+                  justifyContent: 'flex-end',
+                  // position: 'absolute',
+                  // top: 100,
+                  // marginTop: 100,
+                }}>
+                <Icon name="camera" size={30} color={lightblue[50]} />
+              </TouchableOpacity>
+            </Animated.View>
+
+            {/* </Animated.View> */}
+            {/* <View
             style={{
               flex: 1,
               paddingHorizontal: 5,
@@ -262,28 +310,30 @@ const MyProfile = () => {
               <Icon name="qrcode" size={40} color={lightblue[200]} />
             </TouchableOpacity>
           </View> */}
-        </View>
-      </Animated.View>
-      {showListSettings ? (
-        <>
-          {listSettings.map((data, index) => {
-            return (
-              <ListSettingsComponent
-                key={data.id}
-                label={data.label}
-                description={data.description}
-                icon={data.icon}
-                id={data.id}
-                delay={index * 500}
-                title={data.title}
-              />
-            );
-          })}
-        </>
-      ) : (
-        <></>
-      )}
-    </View>
+          </View>
+        </Animated.View>
+        {showListSettings ? (
+          <>
+            {listSettings.map((data, index) => {
+              return (
+                <ListSettingsComponent
+                  key={data.id}
+                  label={data.label}
+                  description={data.description}
+                  icon={data.icon}
+                  id={data.id}
+                  delay={index * 500}
+                  title={data.title}
+                  clickEdit={data.clickEdit}
+                />
+              );
+            })}
+          </>
+        ) : (
+          <></>
+        )}
+      </View>
+    </>
   );
 };
 
@@ -294,6 +344,7 @@ const ListSettingsComponent = ({
   id,
   delay,
   title,
+  clickEdit,
 }) => {
   const slideAnim = useRef(new Animated.Value(0)).current;
   const slideAnim2 = useRef(new Animated.Value(0)).current;
@@ -375,7 +426,7 @@ const ListSettingsComponent = ({
             right: -Dimensions.get('screen').width,
             // flex: 1,
           }}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => clickEdit && clickEdit()}>
             <Icon name={'pencil'} color={lightblue[50]} size={20} />
           </TouchableOpacity>
         </View>

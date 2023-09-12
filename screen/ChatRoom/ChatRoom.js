@@ -8,7 +8,7 @@ import {TextInput, Animated} from 'react-native';
 import {blue, darkBlue, lightblue, red, yellow} from '../../assets/color/color';
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import {db} from '../VideoCall/utilities/firebase';
-import {getData, keystorage, storeData} from '../../storage';
+import {getData, keystorage} from '../../storage';
 import {firebase} from '@react-native-firebase/messaging';
 import BackroundBubble from '../../component/BackgroundBubble';
 
@@ -21,13 +21,26 @@ const ChatRoom = () => {
 
   const [listMessage, setListMessage] = useState([]);
 
+  const [dataHim, setDataHim] = useState({
+    email: '',
+    name: 'Name user',
+    password: '',
+  });
+
   const navigation = useNavigation();
 
   const route = useRoute();
 
-  useEffect(() => {}, []);
-
   const [keyboardStatus, setKeyboardStatus] = useState('');
+
+  useEffect(() => {
+    db.collection('users')
+      .doc(route.params.id)
+      .get()
+      .then(res => {
+        setDataHim(res.data());
+      });
+  }, []);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () =>
@@ -71,9 +84,6 @@ const ChatRoom = () => {
   const slideAnim3 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
   const slideAnim4 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
 
-  const slideAnim5 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-  const slideAnim6 = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-
   useEffect(() => {
     Animated.timing(slideAnim, {
       toValue: 100,
@@ -102,36 +112,46 @@ const ChatRoom = () => {
   const [message, setMessage] = useState('');
 
   const getMessage = async () => {
-    let dataLogin = await getData({key: keystorage.login});
-    db.collection('message')
-      .doc(`${dataLogin.id}-${route.params.id}`)
-      .onSnapshot(async documentSnapshot => {
-        if (
-          documentSnapshot.data() &&
-          Object.keys(documentSnapshot.data()).length
-        ) {
-          const dataArray = [];
+    try {
+      let dataLogin = await getData({key: keystorage.login});
 
-          for (const key in documentSnapshot.data()) {
-            if (Object.hasOwnProperty.call(documentSnapshot.data(), key)) {
-              dataArray.push({...documentSnapshot.data()[key], id: key});
-            }
-          }
-          let newData = dataArray.sort((a, b) => a.time - b.time);
-          if (newData !== listMessage) {
-            await setListMessage(dataArray.sort((a, b) => a.time - b.time));
+      const docMessage = await db
+        .collection('message')
+        .doc(`${dataLogin.id}-${route.params.id}`)
+        .get();
 
-            if (isAtBottom) {
-              scrollToBottom();
+      if (docMessage.exists) {
+        db.collection('message')
+          .doc(`${dataLogin.id}-${route.params.id}`)
+          .onSnapshot(async documentSnapshot => {
+            if (
+              documentSnapshot.data() &&
+              Object.keys(documentSnapshot.data()).length
+            ) {
+              const dataArray = [];
+              for (const key in documentSnapshot.data()) {
+                if (Object.hasOwnProperty.call(documentSnapshot.data(), key)) {
+                  dataArray.push({...documentSnapshot.data()[key], id: key});
+                }
+              }
+              let newData = dataArray.sort((a, b) => a.time - b.time);
+              if (newData !== listMessage) {
+                await setListMessage(dataArray.sort((a, b) => a.time - b.time));
+                if (isAtBottom) {
+                  scrollToBottom();
+                }
+              }
+            } else {
+              db.doc(`listChat/${dataLogin.id}`).update({
+                [route.params.id]: firebase.firestore.FieldValue.delete(),
+              });
+              setListMessage([]);
             }
-          }
-        } else {
-          db.doc(`listChat/${dataLogin.id}`).update({
-            [route.params.id]: firebase.firestore.FieldValue.delete(),
           });
-          setListMessage([]);
-        }
-      });
+      }
+    } catch (err) {
+      console.log('error');
+    }
   };
 
   const [dataLogin, setDataLogin] = useState({});
@@ -150,12 +170,12 @@ const ChatRoom = () => {
   const sendMessage = async () => {
     let time = new Date().getTime();
     if (dataLogin) {
+      // ${dataLogin.id}-${route.params.id}
       let doc = await db
         .doc(`message/${dataLogin.id}-${route.params.id}`)
         .get();
 
       if (doc.exists) {
-        readMessage(dataLogin);
         db.collection('message')
           .doc(`${dataLogin.id}-${route.params.id}`)
           .update({
@@ -167,6 +187,23 @@ const ChatRoom = () => {
               to: route.params.id,
             },
           });
+      } else {
+        await db
+          .collection('message')
+          .doc(`${dataLogin.id}-${route.params.id}`)
+          .set({
+            [time]: {
+              from: dataLogin.id,
+              message: message,
+              read: true,
+              time: new Date(),
+              to: route.params.id,
+            },
+          });
+      }
+
+      if (doc.exists) {
+        readMessage(dataLogin);
 
         await db
           .collection('message')
@@ -186,17 +223,7 @@ const ChatRoom = () => {
       } else {
         newReadMessage(dataLogin);
 
-        db.collection('message')
-          .doc(`${dataLogin.id}-${route.params.id}`)
-          .set({
-            [time]: {
-              from: dataLogin.id,
-              message: message,
-              read: true,
-              time: new Date(),
-              to: route.params.id,
-            },
-          });
+        getMessage();
 
         await db
           .collection('message')
@@ -367,7 +394,7 @@ const ChatRoom = () => {
           flex: 1,
           backgroundColor: lightblue[50],
         }}>
-          <BackroundBubble/>
+        <BackroundBubble />
         <View
           style={{
             flexDirection: 'row',
@@ -427,7 +454,7 @@ const ChatRoom = () => {
                   fontWeight: '500',
                   color: lightblue[100],
                 }}>
-                Name User
+                {dataHim.name}
               </Text>
             </TouchableOpacity>
           </Animated.View>
