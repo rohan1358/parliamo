@@ -6,13 +6,13 @@ import {
   Dimensions,
   PanResponder,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {lightblue, red} from '../../assets/color/color';
-import {imageDummy1} from '../../assets/image/imageDummy';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {useNavigation, useIsFocused} from '@react-navigation/native';
-import {keystorage, removeData} from '../../storage';
+import { lightblue, red } from '../../assets/color/color';
+import { imageDummy1 } from '../../assets/image/imageDummy';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { keystorage, removeData } from '../../storage';
 
 // const sleep = ms => {
 //   return new Promise(resolve => setTimeout(resolve, ms));
@@ -52,11 +52,26 @@ const close = 0;
 const Settings = () => {
   const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const buttonLogoutAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim2 = useRef(new Animated.Value(0)).current;
   const slideAnim3 = useRef(new Animated.Value(-100)).current;
   const slideAnim4 = useRef(new Animated.Value(0)).current;
 
   const [showListSettings, setShowListSettings] = useState(false);
+
+  useEffect(() => {
+    Animated.timing(buttonLogoutAnim, {
+      toValue: 1,
+      duration: 6000,
+      useNativeDriver: 
+      
+      false,
+    }).start(
+
+
+
+    )
+  }, [])
 
   const openListLanguage = () => {
     Animated.timing(slideAnim4, {
@@ -81,7 +96,7 @@ const Settings = () => {
       toValue: 1,
       duration: 500,
       useNativeDriver: false,
-    }).start(() => {});
+    }).start(() => { });
 
     Animated.timing(slideAnim3, {
       toValue: 0,
@@ -115,7 +130,7 @@ const Settings = () => {
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderMove: (event, gestureState) => {
-      const {dy} = gestureState;
+      const { dy } = gestureState;
 
       Animated.timing(slideAnim4, {
         toValue: direction - dy,
@@ -157,7 +172,7 @@ const Settings = () => {
   });
 
   const handleLogout = () => {
-    removeData({key: keystorage.login}).then(res => {
+    removeData({ key: keystorage.login }).then(res => {
       navigation.navigate('Login');
     });
   };
@@ -287,24 +302,39 @@ const Settings = () => {
           ) : (
             <></>
           )}
-          <TouchableOpacity
-            style={{
-              backgroundColor: red[400],
-              padding: 10,
-              alignItems: 'center',
-              alignSelf: 'center',
-              borderRadius: 10,
-            }}
-            onPress={() => handleLogout()}>
-            <Text
+          <Animated.View style={{
+            opacity: buttonLogoutAnim
+
+
+            
+
+
+
+
+
+
+
+          }}>
+            <TouchableOpacity
               style={{
-                fontSize: 20,
-                fontWeight: '500',
-                color: lightblue[100],
-              }}>
-              Logout
-            </Text>
-          </TouchableOpacity>
+                backgroundColor: red[400],
+                padding: 10,
+                alignItems: 'center',
+                alignSelf: 'center',
+                borderRadius: 10,
+              }}
+              onPress={() => handleLogout()}>
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: '500',
+                  color: lightblue[100],
+                }}>
+                Logout
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+
         </>
       </Animated.View>
 
@@ -318,10 +348,6 @@ const Settings = () => {
           bottom: 0,
           flex: 1,
         }}
-        // onTouchStart={e => {
-        //   console.log('touchMove', e.nativeEvent);
-        // }}
-        // onTouchMove={e => console.log(e.nativeEvent)}
       >
         <View
           style={{

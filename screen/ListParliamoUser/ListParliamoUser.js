@@ -36,9 +36,6 @@ const ListChat = () => {
       .get()
       .then(res => {
         setStateListParliamoUser(res.docs);
-        res.docs.forEach(data => {
-          console.log(data.data());
-        });
       });
   };
 
@@ -338,12 +335,16 @@ const SideBarComponent = ({setClose, navigation}) => {
           borderWidth: 2,
           borderColor: blue[500],
         }}>
-        <TouchableOpacity onPress={() => closeComponent()}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Profile');
+            // closeComponent()
+          }}>
           <Text
             style={{
               fontSize: 20,
             }}>
-            Menu 1
+            Profile
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>

@@ -41,7 +41,7 @@ const Login = () => {
   const slideAnim2 = useRef(new Animated.Value(0)).current;
   const slideAnim3 = useRef(new Animated.Value(0)).current;
   const slideAnim4 = useRef(new Animated.Value(0)).current;
-  const slideAnim5 = useRef(new Animated.Value(0)).current;
+  const slideAnim5 = useRef(new Animated.Value(-250)).current;
   const slideAnim6 = useRef(new Animated.Value(0)).current;
   const slideAnim7 = useRef(new Animated.Value(0)).current;
 
@@ -94,7 +94,7 @@ const Login = () => {
                       useNativeDriver: false,
                     }).start(cb => {
                       Animated.timing(slideAnim5, {
-                        toValue: -200,
+                        toValue: 0,
                         duration: 500,
                         useNativeDriver: false,
                       }).start(cb => {
@@ -132,9 +132,7 @@ const Login = () => {
         });
         navigation.navigate('ListChat');
       })
-      .catch(err => {
-        console.log('err', err);
-      });
+      .catch(err => {});
   };
 
   useEffect(() => {
@@ -232,6 +230,7 @@ const Login = () => {
             ]}>
             <Text style={styles.label}>Password</Text>
             <TextInput
+              autoCapitalize="none"
               style={styles.textInput}
               secureTextEntry={true}
               onChangeText={e => handleChange(e, 'password')}
@@ -264,7 +263,7 @@ const Login = () => {
       <Animated.View
         style={{
           width: '50%',
-          transform: [{translateY: slideAnim5}],
+          bottom: slideAnim5,
         }}>
         <TouchableOpacity
           activeOpacity={0.5}
@@ -273,7 +272,7 @@ const Login = () => {
             alignItems: 'center',
             borderRadius: 5,
             padding: 10,
-            bottom: -200,
+            // bottom: -200,
           }}
           onPress={() => {
             handleLogin();
@@ -288,22 +287,23 @@ const Login = () => {
             Login
           </Text>
         </TouchableOpacity>
-      </Animated.View>
+        {/* </Animated.View> */}
 
-      <Text
-        style={{
-          fontSize: 20,
-          color: lightblue[400],
-          fontWeight: 'bold',
-        }}>
-        Or
-      </Text>
+        <Text
+          style={{
+            fontSize: 20,
+            color: lightblue[400],
+            fontWeight: 'bold',
+            textAlign: 'center',
+          }}>
+          Or
+        </Text>
 
-      <Animated.View
+        {/* <Animated.View
         style={{
           width: '50%',
           transform: [{translateY: slideAnim5}],
-        }}>
+        }}> */}
         <TouchableOpacity
           activeOpacity={0.5}
           style={{
@@ -311,7 +311,7 @@ const Login = () => {
             alignItems: 'center',
             borderRadius: 5,
             padding: 10,
-            bottom: -200,
+            // bottom: -200,
           }}
           onPress={() => {
             navigation.navigate('Register');

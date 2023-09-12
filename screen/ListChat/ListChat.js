@@ -22,6 +22,7 @@ import {imageDummy1} from '../../assets/image/imageDummy';
 import Svg, {Path} from 'react-native-svg';
 import {getData, keystorage} from '../../storage';
 import {db} from '../VideoCall/utilities/firebase';
+import BackroundBubble from '../../component/BackgroundBubble';
 
 const listChats = false;
 
@@ -67,6 +68,7 @@ const ListChat = () => {
             setSearchComp(false);
           }
         }}>
+        <BackroundBubble />
         <View
           style={{
             flexDirection: 'row',
@@ -266,12 +268,16 @@ const SideBarComponent = ({setClose, navigation}) => {
           borderWidth: 2,
           borderColor: blue[500],
         }}>
-        <TouchableOpacity onPress={() => closeComponent()}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Profile');
+            // closeComponent()
+          }}>
           <Text
             style={{
               fontSize: 20,
             }}>
-            Menu 1
+            Profile
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>

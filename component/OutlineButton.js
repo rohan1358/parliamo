@@ -60,7 +60,8 @@ const ContainedButton = ({
   }, []);
 
   return (
-    <Animated.View style={{transform: [{translateX: fadeAnim}]}}>
+    <Animated.View
+      style={{transform: [{translateX: fadeAnim}], marginHorizontal: 5}}>
       <TouchableOpacity
         activeOpacity={0.5}
         style={[
@@ -105,7 +106,7 @@ const ContainedButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 5,
+    borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 10,
     display: 'flex',

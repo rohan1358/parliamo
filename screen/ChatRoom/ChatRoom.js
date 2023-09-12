@@ -10,6 +10,7 @@ import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import {db} from '../VideoCall/utilities/firebase';
 import {getData, keystorage, storeData} from '../../storage';
 import {firebase} from '@react-native-firebase/messaging';
+import BackroundBubble from '../../component/BackgroundBubble';
 
 const ChatRoom = () => {
   const textInputRef = useRef();
@@ -366,6 +367,7 @@ const ChatRoom = () => {
           flex: 1,
           backgroundColor: lightblue[50],
         }}>
+          <BackroundBubble/>
         <View
           style={{
             flexDirection: 'row',
