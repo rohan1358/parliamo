@@ -32,6 +32,7 @@
     "react-native-webrtc": "^111.0.3",
     "react-redux": "^8.1.1",
     "redux": "^4.2.1",
+    "rn-emoji-keyboard": "^1.5.1",
     "socket.io-client": "^4.7.1"
   },
   "devDependencies": {

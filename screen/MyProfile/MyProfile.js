@@ -16,37 +16,6 @@ import {useNavigation} from '@react-navigation/native';
 import {getData, keystorage} from '../../storage';
 import ModalEdit from './ModalEdit';
 
-const listSettings = ({name}) => {
-  return [
-    {
-      title: 'Name',
-      icon: 'account',
-      label: name || 'Name User',
-      description: 'Security notifications, change number',
-      id: Math.random(),
-    },
-    {
-      title: 'About',
-      icon: 'information-outline',
-      label: 'Hey there! I am using Parliamo',
-      description: '-',
-      id: Math.random(),
-    },
-    {
-      title: 'Phone',
-
-      icon: 'phone',
-      label: '+62 855-2453-1474',
-      description: '-',
-      id: Math.random(),
-    },
-  ];
-};
-
-// const sleep = ms => {
-//   return new Promise(resolve => setTimeout(resolve, ms));
-// };
-
 const MyProfile = () => {
   const [dataLogin, setDataLogin] = useState({});
 
@@ -62,6 +31,8 @@ const MyProfile = () => {
   const [showListSettings, setShowListSettings] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalAboutVisible, setModalAboutVisible] = useState(false);
+  const [modalEmailVisible, setModalEmailVisible] = useState(false);
 
   let [listSettings, setListSettings] = useState([
     {
@@ -75,17 +46,18 @@ const MyProfile = () => {
     {
       title: 'About',
       icon: 'information-outline',
-      label: 'Hey there! I am using Parliamo',
+      label: dataLogin.about || 'Hey there! I am using Parliamo',
       description: '-',
       id: Math.random(),
+      clickEdit: () => setModalAboutVisible(true),
     },
     {
-      title: 'Phone',
-
-      icon: 'phone',
+      title: 'Email',
+      icon: 'email',
       label: '+62 855-2453-1474',
       description: '-',
       id: Math.random(),
+      clickEdit: () => setModalEmailVisible(true),
     },
   ]);
 
@@ -93,12 +65,14 @@ const MyProfile = () => {
     const getDataLogin = async () => {
       await getData({key: keystorage.login}).then(res => {
         listSettings[0] = {...listSettings[0], label: res.name};
+        listSettings[1] = {...listSettings[1], label: res.about};
+        listSettings[2] = {...listSettings[2], label: res.email};
         setListSettings(listSettings);
         setDataLogin(res);
       });
     };
     getDataLogin();
-  }, []);
+  }, [modalVisible, modalAboutVisible, modalEmailVisible]);
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -170,6 +144,20 @@ const MyProfile = () => {
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         dataLogin={dataLogin}
+        keys="name"
+      />
+
+      <ModalEdit
+        modalVisible={modalAboutVisible}
+        setModalVisible={setModalAboutVisible}
+        dataLogin={dataLogin}
+        keys="about"
+      />
+      <ModalEdit
+        modalVisible={modalEmailVisible}
+        setModalVisible={setModalEmailVisible}
+        dataLogin={dataLogin}
+        keys="email"
       />
       <View
         onTouchStart={() => {

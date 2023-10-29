@@ -1,12 +1,13 @@
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   TouchableOpacity,
   Image,
   Animated,
   Dimensions,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {lightblue, yellow} from '../../assets/color/color';
@@ -18,6 +19,8 @@ import {db} from '../VideoCall/utilities/firebase';
 import {getData, keystorage, storeData} from '../../storage';
 import BackroundBubble from '../../component/BackgroundBubble';
 import ModalFailedLogin from './ModalFailedLogin';
+import Input from '../../component/Input/Input';
+// import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 
 const sleep = ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -39,8 +42,12 @@ const Login = () => {
   const fadeAnim2 = useRef(new Animated.Value(0)).current;
   const fadeAnim3 = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim2 = useRef(new Animated.Value(0)).current;
-  const slideAnim3 = useRef(new Animated.Value(0)).current;
+  const slideAnim2 = useRef(
+    new Animated.Value(-Dimensions.get('screen').width),
+  ).current;
+  const slideAnim3 = useRef(
+    new Animated.Value(-Dimensions.get('screen').width),
+  ).current;
   const slideAnim4 = useRef(new Animated.Value(0)).current;
   const slideAnim5 = useRef(new Animated.Value(-250)).current;
   const slideAnim6 = useRef(new Animated.Value(0)).current;
@@ -80,12 +87,12 @@ const Login = () => {
                 useNativeDriver: false,
               }).start(cb => {
                 Animated.timing(slideAnim2, {
-                  toValue: Dimensions.get('screen').width,
+                  toValue: 0,
                   duration: 500,
                   useNativeDriver: false,
                 }).start(cb => {
                   Animated.timing(slideAnim3, {
-                    toValue: Dimensions.get('screen').width,
+                    toValue: 0,
                     duration: 500,
                     useNativeDriver: false,
                   }).start(cb => {
@@ -147,6 +154,7 @@ const Login = () => {
         navigation.navigate('ListChat');
       })
       .catch(err => {
+        console.log('err', err);
         setModalFailedLogin(true);
       });
   };
@@ -163,248 +171,255 @@ const Login = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <BackroundBubble />
-      <ModalFailedLogin
-        modalVisible={modalFailedLogin}
-        setModalVisible={setModalFailedLogin}
-      />
-      <Text
-        style={{
-          fontWeight: '700',
-          fontSize: 30,
-          letterSpacing: 2,
-          color: lightblue[500],
-        }}>
-        {currentText}
-      </Text>
+    <>
+      <TouchableWithoutFeedback onPressIn={() => Keyboard.dismiss()}>
+        <View style={styles.container}>
+          <BackroundBubble />
 
-      <View
-        style={{
-          width: '70%',
-          marginBottom: 15,
-        }}>
-        <Animated.View
-          style={{
-            opacity: fadeAnim2,
-          }}>
-          <Image
-            source={parliamoImg}
-            style={{
-              width: '100%',
-              objectFit: 'fill',
-              height: 200,
-            }}
+          <ModalFailedLogin
+            modalVisible={modalFailedLogin}
+            setModalVisible={setModalFailedLogin}
           />
-        </Animated.View>
-
-        <Animated.View
-          style={{
-            transform: [{translateY: slideAnim}],
-            opacity: fadeAnim3,
-          }}>
-          <View
-            style={{
-              alignItems: 'center',
-              top: -33.45454406738281,
-            }}
-            onLayout={e => {}}>
-            <Text
-              style={{
-                fontSize: 25,
-                fontWeight: '600',
-                color: lightblue[600],
-                letterSpacing: 2,
-              }}>
-              Welcome :)
-            </Text>
-          </View>
-        </Animated.View>
-
-        <Animated.View
-          style={{
-            transform: [{translateX: slideAnim2}],
-          }}>
-          <View
-            style={[
-              styles.containerTextInput,
-              {left: -Dimensions.get('screen').width},
-            ]}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              keyboardType="email-address"
-              style={styles.textInput}
-              onChangeText={e => handleChange(e, 'email')}
-              autoCapitalize="none"
-            />
-            {fieldEmailInvalid ? (
-              <Text
-                style={{
-                  fontWeight: 'bold',
-                  color: yellow[500],
-                }}>
-                Masukan email anda!
-              </Text>
-            ) : (
-              <></>
-            )}
-          </View>
-        </Animated.View>
-
-        <Animated.View
-          style={{
-            transform: [{translateX: slideAnim3}],
-          }}>
-          <View
-            style={[
-              styles.containerTextInput,
-              {left: -Dimensions.get('screen').width},
-            ]}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              autoCapitalize="none"
-              style={styles.textInput}
-              secureTextEntry={true}
-              onChangeText={e => handleChange(e, 'password')}
-            />
-            {fieldPasswordInvalid ? (
-              <Text
-                style={{
-                  fontWeight: 'bold',
-                  color: yellow[500],
-                }}>
-                Masukan password anda!
-              </Text>
-            ) : (
-              <></>
-            )}
-          </View>
-        </Animated.View>
-
-        <Animated.View
-          style={{
-            transform: [{translateX: slideAnim4}],
-          }}>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            style={{
-              alignItems: 'flex-end',
-              right: -200,
-            }}>
-            <Text
-              style={{
-                color: lightblue[500],
-                fontWeight: '500',
-                fontSize: 15,
-              }}>
-              Forgot password
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-
-      <Animated.View
-        style={{
-          width: '50%',
-          bottom: slideAnim5,
-        }}>
-        <TouchableOpacity
-          activeOpacity={0.5}
-          style={{
-            backgroundColor: lightblue[400],
-            alignItems: 'center',
-            borderRadius: 5,
-            padding: 10,
-            // bottom: -200,
-          }}
-          onPress={() => {
-            handleLogin();
-          }}>
           <Text
             style={{
-              color: lightblue[100],
-              fontWeight: '500',
-              fontSize: 18,
-              letterSpacing: 1,
+              fontWeight: '700',
+              fontSize: 30,
+              letterSpacing: 2,
+              color: lightblue[500],
             }}>
-            Login
+            {currentText}
           </Text>
-        </TouchableOpacity>
-        {/* </Animated.View> */}
 
-        <Text
-          style={{
-            fontSize: 20,
-            color: lightblue[400],
-            fontWeight: 'bold',
-            textAlign: 'center',
-          }}>
-          Or
-        </Text>
+          <View
+            style={{
+              width: '70%',
+              marginBottom: 15,
+            }}>
+            <Animated.View
+              style={{
+                opacity: fadeAnim2,
+              }}>
+              <Image
+                source={parliamoImg}
+                style={{
+                  width: '100%',
+                  objectFit: 'fill',
+                  height: 200,
+                }}
+              />
+            </Animated.View>
 
-        {/* <Animated.View
+            <Animated.View
+              style={{
+                transform: [{translateY: slideAnim}],
+                opacity: fadeAnim3,
+              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                  top: -33.45454406738281,
+                }}
+                onLayout={e => {}}>
+                <Text
+                  style={{
+                    fontSize: 25,
+                    fontWeight: '600',
+                    color: lightblue[600],
+                    letterSpacing: 2,
+                  }}>
+                  Welcome :)
+                </Text>
+              </View>
+            </Animated.View>
+
+            <Animated.View
+              style={[
+                styles.containerTextInput,
+                {
+                  transform: [{translateX: slideAnim2}],
+                },
+              ]}>
+              <Text style={styles.label}>Email</Text>
+
+              <Input
+                keyboardType="email-address"
+                style={styles.textInput}
+                onChangeText={e => handleChange(e, 'email')}
+                autoCapitalize="none"
+              />
+              {/* <TextInput /> */}
+              {fieldEmailInvalid ? (
+                <Text
+                  style={{
+                    fontWeight: 'bold',
+                    color: yellow[500],
+                  }}>
+                  Masukan email anda!
+                </Text>
+              ) : (
+                <></>
+              )}
+            </Animated.View>
+
+            {/* <TextInput
+              style={{
+                backgroundColor: 'blue',
+              }}
+            /> */}
+
+            <Animated.View
+              style={[
+                styles.containerTextInput,
+                {
+                  transform: [{translateX: slideAnim3}],
+                },
+              ]}>
+              <Text style={styles.label}>Password</Text>
+              <Input
+                autoCapitalize="none"
+                style={styles.textInput}
+                secureTextEntry={true}
+                onChangeText={e => handleChange(e, 'password')}
+              />
+              {fieldPasswordInvalid ? (
+                <Text
+                  style={{
+                    fontWeight: 'bold',
+                    color: yellow[500],
+                  }}>
+                  Masukan password anda!
+                </Text>
+              ) : (
+                <></>
+              )}
+            </Animated.View>
+
+            <Animated.View
+              style={{
+                transform: [{translateX: slideAnim4}],
+              }}>
+              <TouchableOpacity
+                activeOpacity={0.5}
+                style={{
+                  alignItems: 'flex-end',
+                  right: -200,
+                }}>
+                <Text
+                  style={{
+                    color: lightblue[500],
+                    fontWeight: '500',
+                    fontSize: 15,
+                  }}>
+                  Forgot password
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+
+          <Animated.View
+            style={{
+              width: '50%',
+              bottom: slideAnim5,
+            }}>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              style={{
+                backgroundColor: lightblue[400],
+                alignItems: 'center',
+                borderRadius: 5,
+                padding: 10,
+                // bottom: -200,
+              }}
+              onPress={() => {
+                handleLogin();
+              }}>
+              <Text
+                style={{
+                  color: lightblue[100],
+                  fontWeight: '500',
+                  fontSize: 18,
+                  letterSpacing: 1,
+                }}>
+                Login
+              </Text>
+            </TouchableOpacity>
+            {/* </Animated.View> */}
+
+            <Text
+              style={{
+                fontSize: 20,
+                color: lightblue[400],
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              Or
+            </Text>
+
+            {/* <Animated.View
         style={{
           width: '50%',
           transform: [{translateY: slideAnim5}],
         }}> */}
-        <TouchableOpacity
-          activeOpacity={0.5}
-          style={{
-            backgroundColor: lightblue[400],
-            alignItems: 'center',
-            borderRadius: 5,
-            padding: 10,
-            // bottom: -200,
-          }}
-          onPress={() => {
-            navigation.navigate('Register');
-          }}>
-          <Text
-            style={{
-              color: lightblue[100],
-              fontWeight: '500',
-              fontSize: 18,
-              letterSpacing: 1,
-            }}>
-            Register
-          </Text>
-        </TouchableOpacity>
-      </Animated.View>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              style={{
+                backgroundColor: lightblue[400],
+                alignItems: 'center',
+                borderRadius: 5,
+                padding: 10,
+                // bottom: -200,
+              }}
+              onPress={() => {
+                navigation.navigate('Register');
+              }}>
+              <Text
+                style={{
+                  color: lightblue[100],
+                  fontWeight: '500',
+                  fontSize: 18,
+                  letterSpacing: 1,
+                }}>
+                Register
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
 
-      <View
-        style={{
-          flexDirection: 'row',
-        }}>
-        <Animated.View
-          style={{
-            // width: '50%',
-            alignItems: 'flex-end',
-            left: slideAnim6,
-            flex: 1,
-          }}>
-          <TouchableOpacity
+          <View
             style={{
-              left: -Dimensions.get('screen').width / 2,
+              flexDirection: 'row',
             }}>
-            <Icon size={30} name="facebook" color={lightblue[400]} />
-          </TouchableOpacity>
-        </Animated.View>
-        <Animated.View
-          style={{
-            // width: '50%',
-            alignItems: 'flex-start',
-            right: slideAnim7,
-            flex: 1,
-          }}>
-          <TouchableOpacity
-            style={{
-              right: -Dimensions.get('screen').width / 2,
-            }}>
-            <Icon size={30} name="google" color={lightblue[400]} />
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-    </View>
+            <Animated.View
+              style={{
+                // width: '50%',
+                alignItems: 'flex-end',
+                left: slideAnim6,
+                flex: 1,
+              }}>
+              <TouchableOpacity
+                style={{
+                  left: -Dimensions.get('screen').width / 2,
+                }}>
+                <Icon size={30} name="facebook" color={lightblue[400]} />
+              </TouchableOpacity>
+            </Animated.View>
+            <Animated.View
+              style={{
+                // width: '50%',
+                alignItems: 'flex-start',
+                right: slideAnim7,
+                flex: 1,
+              }}>
+              <TouchableOpacity
+                style={{
+                  right: -Dimensions.get('screen').width / 2,
+                }}>
+                <Icon size={30} name="google" color={lightblue[400]} />
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </>
   );
 };
 
@@ -457,7 +472,11 @@ const GetReady = () => {
   );
 
   if (focus) {
-    return <Login />;
+    return (
+      <>
+        <Login />
+      </>
+    );
   } else {
     return <Text>Loading . . </Text>;
   }

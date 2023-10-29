@@ -20,6 +20,7 @@ import {blue, lightblue} from '../../assets/color/color';
 import {imageDummy1} from '../../assets/image/imageDummy';
 import {db} from '../VideoCall/utilities/firebase';
 import {getData, keystorage} from '../../storage';
+import SearchComponent from '../../component/SearchComponent';
 
 const ListChat = () => {
   const navigation = useNavigation();
@@ -70,6 +71,12 @@ const ListChat = () => {
             backgroundColor: lightblue[900],
             paddingVertical: 10,
           }}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}>
+            <Icon name="arrow-left" size={30} color={lightblue[100]} />
+          </TouchableOpacity>
           <Text
             style={{
               fontSize: 25,
@@ -80,9 +87,6 @@ const ListChat = () => {
             }}>
             Parliamo User
           </Text>
-          <TouchableOpacity activeOpacity={0.5}>
-            <Icon name="account-multiple" size={30} color={lightblue[100]} />
-          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               setSearchComp(true);
@@ -101,6 +105,7 @@ const ListChat = () => {
           renderItem={({item, index}) => (
             <ListUserParliamo
               name={item.data().name}
+              about={item.data().about}
               navigation={navigation}
               item={item}
             />
@@ -112,7 +117,7 @@ const ListChat = () => {
   );
 };
 
-const ListUserParliamo = ({name, item, navigation}) => {
+const ListUserParliamo = ({name, item, navigation, about}) => {
   return (
     <View
       style={{
@@ -163,7 +168,9 @@ const ListUserParliamo = ({name, item, navigation}) => {
         />
         {/* background end */}
 
-        <View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Profile', item.id)}
+          activeOpacity={0.5}>
           <Image
             source={{
               uri: imageDummy1,
@@ -172,8 +179,10 @@ const ListUserParliamo = ({name, item, navigation}) => {
             width={50}
             borderRadius={50}
           />
-        </View>
-        <View
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Profile', item.id)}
+          activeOpacity={0.5}
           style={{
             flex: 1,
             paddingHorizontal: 20,
@@ -190,9 +199,9 @@ const ListUserParliamo = ({name, item, navigation}) => {
               fontSize: 15,
               fontWeight: '600',
             }}>
-            Web Developer
+            {about || 'Web Developer'}
           </Text>
-        </View>
+        </TouchableOpacity>
         <View>
           <TouchableOpacity>
             <Icon
@@ -225,75 +234,6 @@ const ListUserParliamo = ({name, item, navigation}) => {
   );
 };
 
-const SearchComponent = ({setClose}) => {
-  const slideAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: 100,
-      duration: 500,
-      useNativeDriver: false,
-    }).start(cb => {});
-  }, [slideAnim]);
-
-  const closeComponent = () => {
-    Animated.timing(slideAnim, {
-      toValue: -100,
-      duration: 500,
-      useNativeDriver: false,
-    }).start(cb => {
-      if (setClose) {
-        setClose(false);
-      }
-    });
-  };
-
-  return (
-    <Animated.View
-      style={{
-        top: slideAnim,
-        position: 'absolute',
-        zIndex: 2,
-      }}>
-      <View
-        style={{
-          backgroundColor: lightblue[400],
-          top: -100,
-          flex: 1,
-          width: Dimensions.get('screen').width,
-          borderRadius: 10,
-          borderColor: blue[500],
-          borderWidth: 2,
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            // justifyContent: 'center',
-            // alignContent: 'center',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity onPress={() => closeComponent()}>
-            <Icon
-              name="arrow-left"
-              size={30}
-              style={{
-                color: lightblue[900],
-              }}
-            />
-          </TouchableOpacity>
-          <TextInput
-            style={{
-              color: lightblue[900],
-              fontSize: 20,
-              flex: 1,
-            }}
-            autoFocus={true}
-          />
-        </View>
-      </View>
-    </Animated.View>
-  );
-};
 const SideBarComponent = ({setClose, navigation}) => {
   const slideAnim = useRef(new Animated.Value(0)).current;
 

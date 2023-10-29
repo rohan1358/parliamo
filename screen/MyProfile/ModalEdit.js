@@ -6,6 +6,7 @@ import {
   View,
   Animated,
   Dimensions,
+  Keyboard,
 } from 'react-native';
 import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
 import {lightblue} from '../../assets/color/color';
@@ -14,7 +15,12 @@ import {keystorage, storeData} from '../../storage';
 
 const {height} = Dimensions.get('window');
 
-const ModalEdit = ({modalVisible, setModalVisible, dataLogin}) => {
+const ModalEdit = ({
+  modalVisible,
+  setModalVisible,
+  dataLogin,
+  keys = 'name',
+}) => {
   const anim = useRef(new Animated.Value(-height)).current;
 
   // const [] = useState(false);
@@ -43,11 +49,15 @@ const ModalEdit = ({modalVisible, setModalVisible, dataLogin}) => {
   const onSubmit = () => {
     db.collection('users')
       .doc(dataLogin.id)
-      .update({name: state})
+      .update({[keys]: state})
       .then(res => {
-        storeData({key: keystorage.login, value: {...dataLogin, name: state}});
+        storeData({
+          key: keystorage.login,
+          value: {...dataLogin, [keys]: state},
+        });
         setModalVisible(!modalVisible);
         setState('');
+        Keyboard.dismiss();
       })
       .catch(err => {});
   };
@@ -56,9 +66,20 @@ const ModalEdit = ({modalVisible, setModalVisible, dataLogin}) => {
     <Animated.View
       style={[styles.centeredView, {flex: 1, zIndex: 1, bottom: anim}]}>
       <View style={styles.modalView}>
-        <Text style={{fontSize: 20, fontWeight: 'bold', color: lightblue[600]}}>
-          Enter your name
-        </Text>
+        {keys === 'name' && (
+          <Text
+            style={{fontSize: 20, fontWeight: 'bold', color: lightblue[600]}}>
+            Enter your name
+          </Text>
+        )}
+
+        {keys === 'about' && (
+          <Text
+            style={{fontSize: 20, fontWeight: 'bold', color: lightblue[600]}}>
+            Type about you
+          </Text>
+        )}
+
         <TextInput
           onChangeText={e => {
             setState(e);

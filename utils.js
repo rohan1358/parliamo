@@ -1,3 +1,5 @@
+import {Dimensions} from 'react-native';
+
 function makeId(length) {
   let result = '';
   const characters =
@@ -11,4 +13,16 @@ function makeId(length) {
   return result;
 }
 
-export {makeId};
+function responsiveFontSize(numbers = 1) {
+  // let defaultWidth = 400;
+  let defaultWidth = 200;
+  let thisDimensions = Dimensions.get('window').width;
+  if (thisDimensions >= defaultWidth) {
+    return numbers;
+  }
+
+  let calculate = (thisDimensions / defaultWidth) * 100;
+  return (numbers * calculate) / 100;
+}
+
+export {makeId, responsiveFontSize};

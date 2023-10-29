@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
   ScrollView,
   Modal,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {lightblue, yellow} from '../../assets/color/color';
@@ -21,6 +23,7 @@ import {db} from '../VideoCall/utilities/firebase';
 import {getData, keystorage, storeData} from '../../storage';
 import BackroundBubble from '../../component/BackgroundBubble';
 import ModalFailedRegister from './ModalFailedRegister';
+// import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 const textParliamo = ['P', 'A', 'R', 'L', 'I', 'A', 'M', 'O'];
 
@@ -50,14 +53,20 @@ const Register = () => {
   const fadeAnim2 = useRef(new Animated.Value(0)).current;
   const fadeAnim3 = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim2 = useRef(new Animated.Value(0)).current;
-  const slideAnim3 = useRef(new Animated.Value(0)).current;
+  const slideAnim2 = useRef(
+    new Animated.Value(-Dimensions.get('screen').width),
+  ).current;
+  const slideAnim3 = useRef(
+    new Animated.Value(-Dimensions.get('screen').width),
+  ).current;
   const slideAnim4 = useRef(new Animated.Value(0)).current;
   const slideAnim5 = useRef(new Animated.Value(0)).current;
   const slideAnim6 = useRef(new Animated.Value(0)).current;
   const slideAnim7 = useRef(new Animated.Value(0)).current;
 
-  const nameFieldAnim = useRef(new Animated.Value(0)).current;
+  const nameFieldAnim = useRef(
+    new Animated.Value(-Dimensions.get('screen').width),
+  ).current;
 
   const navigation = useNavigation();
 
@@ -93,17 +102,17 @@ const Register = () => {
                 useNativeDriver: false,
               }).start(cb => {
                 Animated.timing(nameFieldAnim, {
-                  toValue: Dimensions.get('screen').width,
+                  toValue: 0,
                   duration: 500,
                   useNativeDriver: false,
                 }).start(() => {
                   Animated.timing(slideAnim2, {
-                    toValue: Dimensions.get('screen').width,
+                    toValue: 0,
                     duration: 500,
                     useNativeDriver: false,
                   }).start(cb => {
                     Animated.timing(slideAnim3, {
-                      toValue: Dimensions.get('screen').width,
+                      toValue: 0,
                       duration: 500,
                       useNativeDriver: false,
                     }).start(cb => {
@@ -221,73 +230,72 @@ const Register = () => {
   const [modalReject, setModalReject] = useState(false);
 
   return (
-    <View style={styles.container}>
-      <ModalFailedRegister
-        modalVisible={modalRegisterFailed}
-        setModalVisible={setModalRegisterFailed}
-      />
-      <BackroundBubble />
+    <TouchableWithoutFeedback onPressIn={() => Keyboard.dismiss()}>
+      <View style={styles.container}>
+        <ModalFailedRegister
+          modalVisible={modalRegisterFailed}
+          setModalVisible={setModalRegisterFailed}
+        />
+        <BackroundBubble />
 
-      <Text
-        style={{
-          fontWeight: '700',
-          fontSize: 30,
-          letterSpacing: 2,
-          color: lightblue[500],
-        }}>
-        {currentText}
-      </Text>
-
-      <View
-        style={{
-          width: '70%',
-          marginBottom: 15,
-        }}>
-        <Animated.View
+        <Text
           style={{
-            opacity: fadeAnim2,
+            fontWeight: '700',
+            fontSize: 30,
+            letterSpacing: 2,
+            color: lightblue[500],
           }}>
-          <Image
-            source={parliamoImg}
-            style={{
-              width: '100%',
-              objectFit: 'fill',
-              height: 200,
-            }}
-          />
-        </Animated.View>
+          {currentText}
+        </Text>
 
-        <Animated.View
+        <View
           style={{
-            transform: [{translateY: slideAnim}],
-            opacity: fadeAnim3,
+            width: '70%',
+            marginBottom: 15,
           }}>
-          <View
+          <Animated.View
             style={{
-              alignItems: 'center',
-              top: -33.45454406738281,
-            }}
-            onLayout={e => {}}>
-            <Text
+              opacity: fadeAnim2,
+            }}>
+            <Image
+              source={parliamoImg}
               style={{
-                fontSize: 25,
-                fontWeight: '600',
-                color: lightblue[600],
-                letterSpacing: 2,
-              }}>
-              Welcome :)
-            </Text>
-          </View>
-        </Animated.View>
+                width: '100%',
+                objectFit: 'fill',
+                height: 200,
+              }}
+            />
+          </Animated.View>
 
-        <Animated.View
-          style={{
-            transform: [{translateX: nameFieldAnim}],
-          }}>
-          <View
+          <Animated.View
+            style={{
+              transform: [{translateY: slideAnim}],
+              opacity: fadeAnim3,
+            }}>
+            <View
+              style={{
+                alignItems: 'center',
+                top: -33.45454406738281,
+              }}
+              onLayout={e => {}}>
+              <Text
+                style={{
+                  fontSize: 25,
+                  fontWeight: '600',
+                  color: lightblue[600],
+                  letterSpacing: 2,
+                }}>
+                Welcome :)
+              </Text>
+            </View>
+          </Animated.View>
+
+          <Animated.View
             style={[
               styles.containerTextInput,
-              {left: -Dimensions.get('screen').width},
+              {
+                transform: [{translateX: nameFieldAnim}],
+              },
             ]}>
             <Text style={styles.label}>Name</Text>
             <TextInput
@@ -306,17 +314,14 @@ const Register = () => {
             ) : (
               <></>
             )}
-          </View>
-        </Animated.View>
+          </Animated.View>
 
-        <Animated.View
-          style={{
-            transform: [{translateX: slideAnim2}],
-          }}>
-          <View
+          <Animated.View
             style={[
               styles.containerTextInput,
-              {left: -Dimensions.get('screen').width},
+              {
+                transform: [{translateX: slideAnim2}],
+              },
             ]}>
             <Text style={styles.label}>Email</Text>
             <TextInput
@@ -336,17 +341,14 @@ const Register = () => {
             ) : (
               <></>
             )}
-          </View>
-        </Animated.View>
+          </Animated.View>
 
-        <Animated.View
-          style={{
-            transform: [{translateX: slideAnim3}],
-          }}>
-          <View
+          <Animated.View
             style={[
               styles.containerTextInput,
-              {left: -Dimensions.get('screen').width},
+              {
+                transform: [{translateX: slideAnim3}],
+              },
             ]}>
             <Text style={styles.label}>Password</Text>
             <TextInput
@@ -366,79 +368,82 @@ const Register = () => {
             ) : (
               <></>
             )}
-          </View>
-        </Animated.View>
-      </View>
+          </Animated.View>
+        </View>
 
-      <Animated.View
-        style={{
-          width: '50%',
-          transform: [{translateY: slideAnim5}],
-        }}>
-        <TouchableOpacity
-          activeOpacity={0.5}
+        <Animated.View
           style={{
-            backgroundColor: disableBtn ? lightblue[300] : lightblue[400],
-            alignItems: 'center',
-            borderRadius: 5,
-            padding: 10,
-            bottom: -200,
-          }}
-          disabled={disableBtn}
-          onPress={() => {
-            onRegister({values: value});
-            // navigation.navigate('ListChat');
+            width: '50%',
+            transform: [{translateY: slideAnim5}],
           }}>
-          {!disableBtn ? (
-            <Text
+          <TouchableOpacity
+            activeOpacity={0.5}
+            style={{
+              backgroundColor: disableBtn ? lightblue[300] : lightblue[400],
+              alignItems: 'center',
+              borderRadius: 5,
+              padding: 10,
+              bottom: -200,
+            }}
+            disabled={disableBtn}
+            onPress={() => {
+              onRegister({values: value});
+              // navigation.navigate('ListChat');
+            }}>
+            {!disableBtn ? (
+              <Text
+                style={{
+                  color: lightblue[100],
+                  fontWeight: '500',
+                  fontSize: 18,
+                  letterSpacing: 1,
+                }}>
+                Register
+              </Text>
+            ) : (
+              <ActivityIndicator
+                size="large"
+                color={lightblue[100]}
+                style={{}}
+              />
+            )}
+          </TouchableOpacity>
+        </Animated.View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+          }}>
+          <Animated.View
+            style={{
+              alignItems: 'flex-end',
+              left: slideAnim6,
+              flex: 1,
+            }}>
+            <TouchableOpacity
               style={{
-                color: lightblue[100],
-                fontWeight: '500',
-                fontSize: 18,
-                letterSpacing: 1,
+                left: -Dimensions.get('screen').width / 2,
               }}>
-              Register
-            </Text>
-          ) : (
-            <ActivityIndicator size="large" color={lightblue[100]} style={{}} />
-          )}
-        </TouchableOpacity>
-      </Animated.View>
-
-      <View
-        style={{
-          flexDirection: 'row',
-        }}>
-        <Animated.View
-          style={{
-            alignItems: 'flex-end',
-            left: slideAnim6,
-            flex: 1,
-          }}>
-          <TouchableOpacity
+              <Icon size={30} name="facebook" color={lightblue[400]} />
+            </TouchableOpacity>
+          </Animated.View>
+          <Animated.View
             style={{
-              left: -Dimensions.get('screen').width / 2,
+              // width: '50%',
+              alignItems: 'flex-start',
+              right: slideAnim7,
+              flex: 1,
             }}>
-            <Icon size={30} name="facebook" color={lightblue[400]} />
-          </TouchableOpacity>
-        </Animated.View>
-        <Animated.View
-          style={{
-            // width: '50%',
-            alignItems: 'flex-start',
-            right: slideAnim7,
-            flex: 1,
-          }}>
-          <TouchableOpacity
-            style={{
-              right: -Dimensions.get('screen').width / 2,
-            }}>
-            <Icon size={30} name="google" color={lightblue[400]} />
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
+            <TouchableOpacity
+              style={{
+                right: -Dimensions.get('screen').width / 2,
+              }}>
+              <Icon size={30} name="google" color={lightblue[400]} />
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
 
-      {/* <View
+        {/* <View
         style={{
           position: 'absolute',
           backgroundColor: lightblue[200],
@@ -466,7 +471,8 @@ const Register = () => {
           email pernah digunakan, gunakan email yang belum pernah digunakan
         </Text>
       </View> */}
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 

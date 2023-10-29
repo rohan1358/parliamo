@@ -13,6 +13,8 @@ import QrCode from './screen/QrCode/QrCode';
 import NewVideoCall from './screen/NewVIdeoCall/NewVideoCall';
 import MainRegister from './screen/Register/Register';
 import MainListParliamoUser from './screen/ListParliamoUser/ListParliamoUser';
+import {Dimensions} from 'react-native';
+import {responsiveFontSize} from './utils';
 // import VideCall2 from './screen/VideoCall/VideoCall2';
 
 const Stack = createStackNavigator();

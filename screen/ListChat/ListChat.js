@@ -14,7 +14,7 @@ import {
 import OutlineButton from '../../component/OutlineButton';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {FlatList} from 'react-native-gesture-handler';
-import {makeId} from '../../utils';
+import {makeId, responsiveFontSize} from '../../utils';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {blue, lightblue, yellow} from '../../assets/color/color';
 import LottieView from 'lottie-react-native';
@@ -23,6 +23,7 @@ import Svg, {Path} from 'react-native-svg';
 import {getData, keystorage} from '../../storage';
 import {db} from '../VideoCall/utilities/firebase';
 import BackroundBubble from '../../component/BackgroundBubble';
+import SearchComponent from '../../component/SearchComponent';
 
 const listChats = false;
 
@@ -33,6 +34,7 @@ const ListChat = () => {
   const [sideBarComponent, setSideBarComponent] = useState(false);
 
   const [dataListChat, setDataListChat] = useState([]);
+  const [allDataListChat, setAllDataListChat] = useState([]);
 
   const getListChat = async () => {
     let dataLogin = await getData({key: keystorage.login});
@@ -40,6 +42,7 @@ const ListChat = () => {
       if (snapshot.data()) {
         let array = Object.values(snapshot.data());
         setDataListChat(array);
+        setAllDataListChat(array);
       }
     });
   };
@@ -47,9 +50,22 @@ const ListChat = () => {
     getListChat();
   }, []);
 
+  const handleSearch = keyword => {
+    if (keyword) {
+      let results = allDataListChat.filter(data => data.name.includes(keyword));
+      setDataListChat(results);
+    } else {
+      getListChat();
+    }
+  };
+
   return (
     <>
-      {searchComp ? <SearchComponent setClose={setSearchComp} /> : <></>}
+      {searchComp ? (
+        <SearchComponent setClose={setSearchComp} onChangeText={handleSearch} />
+      ) : (
+        <></>
+      )}
       {sideBarComponent ? (
         <SideBarComponent
           setClose={setSideBarComponent}
@@ -77,7 +93,7 @@ const ListChat = () => {
           }}>
           <Text
             style={{
-              fontSize: 25,
+              fontSize: responsiveFontSize(25),
               letterSpacing: 5,
               fontWeight: 'bold',
               flex: 1,
@@ -158,75 +174,6 @@ const ListChat = () => {
   );
 };
 
-const SearchComponent = ({setClose}) => {
-  const slideAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: 100,
-      duration: 500,
-      useNativeDriver: false,
-    }).start(cb => {});
-  }, [slideAnim]);
-
-  const closeComponent = () => {
-    Animated.timing(slideAnim, {
-      toValue: -100,
-      duration: 500,
-      useNativeDriver: false,
-    }).start(cb => {
-      if (setClose) {
-        setClose(false);
-      }
-    });
-  };
-
-  return (
-    <Animated.View
-      style={{
-        top: slideAnim,
-        position: 'absolute',
-        zIndex: 2,
-      }}>
-      <View
-        style={{
-          backgroundColor: lightblue[400],
-          top: -100,
-          flex: 1,
-          width: Dimensions.get('screen').width,
-          borderRadius: 10,
-          borderColor: blue[500],
-          borderWidth: 2,
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            // justifyContent: 'center',
-            // alignContent: 'center',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity onPress={() => closeComponent()}>
-            <Icon
-              name="arrow-left"
-              size={30}
-              style={{
-                color: lightblue[900],
-              }}
-            />
-          </TouchableOpacity>
-          <TextInput
-            style={{
-              color: lightblue[900],
-              fontSize: 20,
-              flex: 1,
-            }}
-            autoFocus={true}
-          />
-        </View>
-      </View>
-    </Animated.View>
-  );
-};
 const SideBarComponent = ({setClose, navigation}) => {
   const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -275,7 +222,7 @@ const SideBarComponent = ({setClose, navigation}) => {
           }}>
           <Text
             style={{
-              fontSize: 20,
+              fontSize: responsiveFontSize(20),
             }}>
             Profile
           </Text>
@@ -283,7 +230,7 @@ const SideBarComponent = ({setClose, navigation}) => {
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Text
             style={{
-              fontSize: 20,
+              fontSize: responsiveFontSize(20),
             }}>
             Settings
           </Text>
@@ -305,7 +252,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   title: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
   },
 });
 

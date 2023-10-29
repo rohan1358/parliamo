@@ -6,13 +6,13 @@ import {
   Dimensions,
   PanResponder,
 } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { lightblue, red } from '../../assets/color/color';
-import { imageDummy1 } from '../../assets/image/imageDummy';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useNavigation, useIsFocused } from '@react-navigation/native';
-import { keystorage, removeData } from '../../storage';
+import {lightblue, red} from '../../assets/color/color';
+import {imageDummy1} from '../../assets/image/imageDummy';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {useNavigation, useIsFocused} from '@react-navigation/native';
+import {getData, keystorage, removeData} from '../../storage';
 
 // const sleep = ms => {
 //   return new Promise(resolve => setTimeout(resolve, ms));
@@ -63,15 +63,9 @@ const Settings = () => {
     Animated.timing(buttonLogoutAnim, {
       toValue: 1,
       duration: 6000,
-      useNativeDriver: 
-      
-      false,
-    }).start(
-
-
-
-    )
-  }, [])
+      useNativeDriver: false,
+    }).start();
+  }, []);
 
   const openListLanguage = () => {
     Animated.timing(slideAnim4, {
@@ -96,7 +90,7 @@ const Settings = () => {
       toValue: 1,
       duration: 500,
       useNativeDriver: false,
-    }).start(() => { });
+    }).start(() => {});
 
     Animated.timing(slideAnim3, {
       toValue: 0,
@@ -130,7 +124,7 @@ const Settings = () => {
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderMove: (event, gestureState) => {
-      const { dy } = gestureState;
+      const {dy} = gestureState;
 
       Animated.timing(slideAnim4, {
         toValue: direction - dy,
@@ -171,8 +165,19 @@ const Settings = () => {
     },
   });
 
+  const [dataLogin, setDataLogin] = useState({});
+
+  useEffect(() => {
+    const getDataLogin = async () => {
+      await getData({key: keystorage.login}).then(res => {
+        setDataLogin(res);
+      });
+    };
+    getDataLogin();
+  }, []);
+
   const handleLogout = () => {
-    removeData({ key: keystorage.login }).then(res => {
+    removeData({key: keystorage.login}).then(res => {
       navigation.navigate('Login');
     });
   };
@@ -255,22 +260,25 @@ const Settings = () => {
                   flex: 1,
                   paddingHorizontal: 5,
                 }}>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 'bold',
-                    color: lightblue[100],
-                  }}>
-                  Name User
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    color: lightblue[200],
-                  }}>
-                  Hey there! I am using Parliamo
-                </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('MyProfile')}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 'bold',
+                      color: lightblue[100],
+                    }}>
+                    {dataLogin.name || 'Name User'}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontWeight: '500',
+                      color: lightblue[200],
+                    }}>
+                    {dataLogin.about || 'Hey there! I am using Parliamo'}
+                  </Text>
+                </TouchableOpacity>
               </View>
               <View>
                 <TouchableOpacity
@@ -302,19 +310,10 @@ const Settings = () => {
           ) : (
             <></>
           )}
-          <Animated.View style={{
-            opacity: buttonLogoutAnim
-
-
-            
-
-
-
-
-
-
-
-          }}>
+          <Animated.View
+            style={{
+              opacity: buttonLogoutAnim,
+            }}>
             <TouchableOpacity
               style={{
                 backgroundColor: red[400],
@@ -334,7 +333,6 @@ const Settings = () => {
               </Text>
             </TouchableOpacity>
           </Animated.View>
-
         </>
       </Animated.View>
 
@@ -347,8 +345,7 @@ const Settings = () => {
           width: '100%',
           bottom: 0,
           flex: 1,
-        }}
-      >
+        }}>
         <View
           style={{
             width: '100%',

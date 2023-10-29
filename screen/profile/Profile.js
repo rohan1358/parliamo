@@ -12,10 +12,12 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {lightblue, red} from '../../assets/color/color';
 import {Image} from 'react-native';
 import {imageDummy1} from '../../assets/image/imageDummy';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {db} from '../VideoCall/utilities/firebase';
 
 const Profile = () => {
   const navigation = useNavigation();
+  const route = useRoute();
 
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
 
@@ -125,6 +127,23 @@ const Profile = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
+  const [detailUser, setDetailUser] = useState({
+    email: '-',
+    name: '-',
+    password: '-',
+  });
+
+  useEffect(() => {
+    if (route.params) {
+      db.collection('users')
+        .doc(route.params)
+        .get()
+        .then(res => {
+          setDetailUser(res.data());
+        });
+    }
+  }, []);
+
   return (
     <View
       style={{
@@ -184,7 +203,7 @@ const Profile = () => {
                 fontWeight: 'bold',
                 fontSize: 30,
               }}>
-              Name User
+              {detailUser.name}
             </Text>
           </Animated.View>
 
@@ -198,7 +217,7 @@ const Profile = () => {
                 fontWeight: 'bold',
                 fontSize: 15,
               }}>
-              +62 855-2435-1474
+              {detailUser.email}
             </Text>
           </Animated.View>
 
