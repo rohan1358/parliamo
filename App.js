@@ -27,6 +27,17 @@ const App = () => {
         initialRouteName="Login"
         screenOptions={{headerShown: false}}>
         <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{title: 'Login'}}
+        />
+        <Stack.Screen
+          name="Register"
+          component={MainRegister}
+          options={{title: 'Register'}}
+        />
+
+        <Stack.Screen
           name="Chat"
           component={ChatScreen}
           options={{title: 'Chatting Room'}}
@@ -46,16 +57,7 @@ const App = () => {
           component={Profile}
           options={{title: 'Profile'}}
         />
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{title: 'Login'}}
-        />
-        <Stack.Screen
-          name="Register"
-          component={MainRegister}
-          options={{title: 'Register'}}
-        />
+
         <Stack.Screen
           name="Settings"
           component={Settings}

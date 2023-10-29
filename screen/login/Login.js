@@ -170,6 +170,8 @@ const Login = () => {
     });
   };
 
+  const passwordRef = useRef();
+
   return (
     <>
       <TouchableWithoutFeedback onPressIn={() => Keyboard.dismiss()}>
@@ -246,6 +248,9 @@ const Login = () => {
                 style={styles.textInput}
                 onChangeText={e => handleChange(e, 'email')}
                 autoCapitalize="none"
+                onSubmitEditing={() => {
+                  passwordRef.current.focus();
+                }}
               />
               {/* <TextInput /> */}
               {fieldEmailInvalid ? (
@@ -276,10 +281,14 @@ const Login = () => {
               ]}>
               <Text style={styles.label}>Password</Text>
               <Input
+                refs={passwordRef}
                 autoCapitalize="none"
                 style={styles.textInput}
                 secureTextEntry={true}
                 onChangeText={e => handleChange(e, 'password')}
+                onSubmitEditing={() => {
+                  handleLogin();
+                }}
               />
               {fieldPasswordInvalid ? (
                 <Text

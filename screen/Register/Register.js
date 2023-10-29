@@ -229,6 +229,9 @@ const Register = () => {
 
   const [modalReject, setModalReject] = useState(false);
 
+  const emailRef = useRef();
+  const passwordRef = useRef();
+
   return (
     <TouchableWithoutFeedback onPressIn={() => Keyboard.dismiss()}>
       <View style={styles.container}>
@@ -302,6 +305,9 @@ const Register = () => {
               autoCapitalize="none"
               style={styles.textInput}
               onChangeText={e => handleChangeText({value: e, name: 'name'})}
+              onSubmitEditing={() => {
+                emailRef.current.focus();
+              }}
             />
             {fieldNameInvalid ? (
               <Text
@@ -325,6 +331,10 @@ const Register = () => {
             ]}>
             <Text style={styles.label}>Email</Text>
             <TextInput
+              onSubmitEditing={() => {
+                passwordRef.current.focus();
+              }}
+              ref={emailRef}
               autoCapitalize="none"
               keyboardType="email-address"
               style={styles.textInput}
@@ -352,6 +362,10 @@ const Register = () => {
             ]}>
             <Text style={styles.label}>Password</Text>
             <TextInput
+              ref={passwordRef}
+              onSubmitEditing={() => {
+                onRegister({values: value});
+              }}
               autoCapitalize="none"
               style={styles.textInput}
               secureTextEntry={true}
